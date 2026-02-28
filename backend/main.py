@@ -1,14 +1,19 @@
 import re
+import os
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, status
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Dict
 
 app = FastAPI()
 
-# --- CORS: allow only the frontend origin in production ---
+# --- CORS: reads from env var ALLOWED_ORIGINS (comma-separated) ---
+# Example: ALLOWED_ORIGINS=https://seusite.com.br,https://www.seusite.com.br
+_raw_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173")
+allowed_origins = [o.strip() for o in _raw_origins.split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

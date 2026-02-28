@@ -76,6 +76,8 @@ frontend/.vite/
 frontend/.env
 frontend/.env.local
 frontend/.env.*.local
+frontend/.env.production
+backend/.env
 
 # ---------------- Editors / IDEs ----------------------------
 # VS Code
