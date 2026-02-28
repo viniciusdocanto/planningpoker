@@ -3,7 +3,7 @@ services:
     name: planning-poker-api
     runtime: python
     buildCommand: pip install -r backend/requirements.txt
-    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
+    startCommand: cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: ALLOWED_ORIGINS
         sync: false   # preencha no dashboard do Render com a URL do seu site
