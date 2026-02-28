@@ -211,7 +211,7 @@
                 <span class="mx-2 opacity-50">|</span>
                 <a href="https://docanto.net" target="_blank" class="hover:text-fuchsia-800 dark:hover:text-fuchsia-400 transition-colors font-black underline decoration-fuchsia-500/30 underline-offset-4">Vinicius do Canto</a>
               </div>
-              <span class="opacity-30 tracking-normal normal-case font-mono text-[8px]">v0.9.0</span>
+              <span class="opacity-30 tracking-normal normal-case font-mono text-[8px]">v{{ appVersion }}</span>
             </div>
           </footer>
         </div>
@@ -227,7 +227,7 @@
           <span class="mx-2 opacity-50">|</span>
           <a href="https://docanto.net" target="_blank" class="hover:text-fuchsia-800 dark:hover:text-fuchsia-400 transition-colors font-black underline decoration-fuchsia-500/30 underline-offset-4">Vinicius do Canto</a>
         </div>
-        <span class="opacity-30 tracking-normal normal-case font-mono text-[8px]">v0.7.1</span>
+        <span class="opacity-30 tracking-normal normal-case font-mono text-[8px]">v0.9.0</span>
       </div>
     </footer>
 
@@ -249,6 +249,7 @@ const userName = ref(sessionStorage.getItem('playerName') || localStorage.getIte
 if (!userName.value) {
   router.push(`/?room=${roomId.value}`)
 }
+const appVersion = __APP_VERSION__
 const deck = ['0', '½', '1', '2', '3', '5', '8', '13', '21', '34', '55', '89', '?', '☕']
 
 const gameState = ref({ users: {}, revealed: false, host: null })

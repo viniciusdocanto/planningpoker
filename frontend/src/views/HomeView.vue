@@ -95,7 +95,7 @@
         <span class="mx-2 opacity-50">|</span>
         <a href="https://docanto.net" target="_blank" class="hover:text-fuchsia-800 dark:hover:text-fuchsia-400 transition-colors font-black underline decoration-fuchsia-500/30 underline-offset-4">Vinicius do Canto</a>
       </div>
-      <span class="opacity-30 tracking-normal normal-case font-mono text-[8px]">v0.9.0</span>
+      <span class="opacity-30 tracking-normal normal-case font-mono text-[8px]">v{{ appVersion }}</span>
     </div>
   </div>
 </template>
@@ -168,5 +168,6 @@ const handleAction = () => {
   
   router.push(`/room/${targetRoom}`)
 }
+const appVersion = __APP_VERSION__
 </script>
 

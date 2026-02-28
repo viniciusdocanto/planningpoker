@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.9.1] - 2026-02-28
+### Added
+- **Versionamento Automatizado:** O frontend agora lê a versão diretamente de `package.json` através do Vite, eliminando a necessidade de atualizações manuais no código-fonte.
+
 ## [0.9.0] - 2026-02-28
 ### Added
 - **Rate Limiting:** Implementado limitador de taxa no backend (máx 10 msgs/seg por conexão) para prevenir spam e abusos.
