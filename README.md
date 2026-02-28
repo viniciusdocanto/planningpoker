@@ -121,6 +121,7 @@ O repositório inclui um workflow em `.github/workflows/deploy-frontend.yml` que
 | `FTP_SERVER` | Endereço FTP da Hostinger (ex: `ftp.seusite.com.br`) |
 | `FTP_USERNAME` | Usuário FTP |
 | `FTP_PASSWORD` | Senha FTP |
+| `FTP_SERVER_DIR` | Diretório de destino no servidor (padrão: `public_html/`) |
 | `VITE_WS_URL` | URL do backend no Render (ex: `wss://planning-poker-api.onrender.com`) |
 
 > Os segredos são usados no build e no upload — nunca ficam expostos no código.
