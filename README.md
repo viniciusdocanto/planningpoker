@@ -1,14 +1,17 @@
 # 🃏 Planning Poker
 
-Aplicação de Planning Poker em tempo real para times ágeis. Crie uma sala, compartilhe o link e vote com seu time sem recarregar a página.
+> Estime tarefas com seu time em tempo real, sem recarregar a página.
+
+[![version](https://img.shields.io/badge/version-0.3.0-indigo.svg)](CHANGELOG.md)
+[![license](https://img.shields.io/badge/license-MIT-purple.svg)](LICENSE)
 
 ## Tecnologias
 
 | Camada | Tecnologia |
 |---|---|
-| Backend | Python + FastAPI + WebSockets |
-| Frontend | Vue 3 + Vite + TailwindCSS v4 |
-| Estilização | Glassmorphism, Inter (Google Fonts), gradientes |
+| Backend | Python 3.8+ · FastAPI · WebSockets · CORS |
+| Frontend | Vue 3 · Vite · TailwindCSS v4 · Vue Router |
+| Estilização | Glassmorphism · Inter (Google Fonts) · gradientes |
 
 ## Pré-requisitos
 
@@ -29,6 +32,7 @@ python -m uvicorn main:app --reload --port 8000
 
 ```bash
 cd frontend
+cp .env.example .env   # configure VITE_WS_URL se necessário
 npm install
 npm run dev
 ```
@@ -46,18 +50,37 @@ Acesse em: **http://localhost:5173**
 - 📊 **Média automática** — calculada ao revelar
 - 🔄 **Reconexão automática** — resiste a quedas de conexão
 - 🎨 **Design premium** — glassmorphism, gradientes, mesa de feltro verde
+- 🔒 **Segurança** — validação server + client, CORS, whitelist de votos, limite de sala
 
 ## Estrutura
 
 ```
 planpoker/
+├── .gitignore
+├── README.md
+├── CHANGELOG.md
 ├── backend/
 │   ├── main.py           # FastAPI + WebSocket server
 │   └── requirements.txt
 └── frontend/
+    ├── .env.example      # configuração de ambiente
+    ├── public/
+    │   └── favicon.svg   # ícone personalizado
     └── src/
         ├── views/
-        │   ├── HomeView.vue   # Tela de entrada
-        │   └── RoomView.vue   # Mesa de votação
-        └── router/index.js
+        │   ├── HomeView.vue   # tela de entrada
+        │   └── RoomView.vue   # mesa de votação
+        ├── router/index.js
+        ├── App.vue
+        └── style.css
 ```
+
+## Variáveis de ambiente
+
+| Variável | Padrão | Descrição |
+|---|---|---|
+| `VITE_WS_URL` | `ws://localhost:8000` | URL base do servidor WebSocket |
+
+## Licença
+
+MIT © [Vinicius](https://github.com/viniciusdocanto)

@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.4.0] - 2026-02-28
+
+### Adicionado
+- `public/favicon.svg` — ícone personalizado do Planning Poker (cartas com gradiente indigo/purple)
+- Seção de variáveis de ambiente no `README.md`
+- Seção de licença no `README.md`
+- Badges de versão e licença no `README.md`
+
+### Alterado
+- `package.json`: nome (`frontend` → `planning-poker`), versão (`0.0.0` → `0.3.0`), description, author, license e homepage adicionados
+- `index.html`: título, lang, favicon e meta description atualizados
+- `README.md`: estrutura do projeto atualizada, `.env.example`, favicon e segurança adicionados
+- `frontend/.gitignore`: simplificado (a raiz já cobre tudo)
+
+### Removido
+- `src/components/HelloWorld.vue` — componente de exemplo do Vite
+- `src/assets/vue.svg` — logo padrão do Vue
+- `public/vite.svg` — logo padrão do Vite (substituído pelo favicon personalizado)
+
+---
+
 ## [0.3.0] - 2026-02-28
 
 ### Segurança

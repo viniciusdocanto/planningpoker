@@ -1,7 +1,11 @@
 {
-  "name": "frontend",
+  "name": "planning-poker",
+  "description": "Planning Poker em tempo real para times ágeis — Vue 3 + FastAPI + WebSockets",
+  "version": "0.3.0",
+  "author": "Vinicius <viniciusdocanto@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/viniciusdocanto/planningpoker",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
