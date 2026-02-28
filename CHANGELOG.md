@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.3] - 2026-02-28
+
+### Adicionado
+- **Interface:** Adicionado rodapé com créditos e links (GitHub e site pessoal) nas telas Home e Sala.
+
+---
+
 ## [0.5.2] - 2026-02-28
 
 ### Adicionado

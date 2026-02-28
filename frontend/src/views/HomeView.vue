@@ -83,8 +83,10 @@
     </div>
 
     <!-- Footer -->
-    <p class="mt-8 text-xs text-slate-600">
-      open source · planning poker em tempo real
+    <p class="mt-8 text-[10px] text-slate-600 uppercase tracking-widest font-medium">
+      <a href="https://github.com/viniciusdocanto/planningpoker" target="_blank" class="hover:text-indigo-400 transition-colors">Open Source</a>
+      <span class="mx-2 opacity-20">|</span>
+      por <a href="https://docanto.net" target="_blank" class="hover:text-fuchsia-400 transition-colors font-bold">Vinicius do Canto</a>
     </p>
   </div>
 </template>

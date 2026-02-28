@@ -203,6 +203,15 @@
       </div>
     </div>
 
+    <!-- Footer -->
+    <div class="fixed bottom-24 sm:bottom-28 left-0 w-full text-center pointer-events-none">
+      <p class="text-[9px] text-slate-600 uppercase tracking-[0.2em] font-medium pointer-events-auto">
+        <a href="https://github.com/viniciusdocanto/planningpoker" target="_blank" class="hover:text-indigo-400 transition-colors">Portfólio GitHub</a>
+        <span class="mx-2 opacity-20">|</span>
+        <a href="https://docanto.net" target="_blank" class="hover:text-fuchsia-400 transition-colors font-bold tracking-normal">docanto.net</a>
+      </p>
+    </div>
+
   </div>
 </template>
 
