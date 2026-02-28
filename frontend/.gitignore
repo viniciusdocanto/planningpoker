@@ -1,0 +1,9 @@
+# Este .gitignore é específico do frontend.
+# O .gitignore da raiz do projeto já cobre node_modules, dist, .env, etc.
+# Aqui ficam apenas overrides ou padrões muito específicos do Vite.
+
+# Cache do Vite
+.vite/
+
+# Typechecking
+*.tsbuildinfo
