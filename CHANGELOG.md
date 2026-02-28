@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.5.0] - 2026-02-28
+
+### Adicionado
+- **CI/CD:** Workflow `.github/workflows/deploy-frontend.yml` para deploy automático via FTP para Hostinger
+- **CI/CD:** Suporte a segredo `FTP_SERVER_DIR` para configurar diretório de destino no servidor
+
+### Corrigido
+- **Deploy:** Suporte a subpastas (ex: `/planningpoker/`) via `base` no `vite.config.js` e `.htaccess` atualizado
+- **Deploy:** Geração do link de convite em `RoomView.vue` agora inclui corretamente a subpasta
+- **Deploy:** Comandos do `render.yaml` e README ajustados para funcionar a partir da raiz do repositório no Render.com
+
+---
+
 ## [0.4.0] - 2026-02-28
 
 ### Adicionado
