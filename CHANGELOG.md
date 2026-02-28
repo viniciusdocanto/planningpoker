@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.6.5] - 2026-02-28
+### Fixed
+- **Dono da Sala (Host):** Corrigido bug crítico na verificação de permissão que impedia o host de ver os botões de Revelar/Resetar.
+- **Corte de Cartas (Clipping):** Implementado container com altura fixa e maior respiro vertical, garantindo que as cartas selecionadas nunca sejam cortadas.
+- **Rodapé Unificado:** Padronizado o design e conteúdo dos créditos em todas as telas da aplicação.
+
+## [0.6.4] - 2026-02-28
+### Fixed
+- **Contraste Absoluto:** Texto alterado para Preto Puro (`#000000`) no modo claro para legibilidade máxima.
+- **Layout do Rodapé:** Créditos movidos para dentro do contêiner fixo das cartas, evitando sobreposições e flutuação indevida.
+- **Corte de Cartas (Clipping):** Aumentado o espaçamento superior e altura do deck para permitir animações sem cortes.
+- **Mesa de Poker:** Melhorado o contraste dos textos centrais ("Pensando/Votaram") com tons mais vibrantes de esmeralda.
+- **Sincronização de Tema:** Implementado ajuste de `color-scheme` no navegador para renderizar componentes internos de acordo com o tema.
+
 ## [0.6.3] - 2026-02-28
 
 ### Corrigido

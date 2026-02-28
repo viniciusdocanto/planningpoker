@@ -11,9 +11,11 @@ const toggleTheme = () => {
 const applyTheme = () => {
   if (isDark.value) {
     document.documentElement.classList.add('dark')
+    document.documentElement.style.colorScheme = 'dark'
     localStorage.setItem('poker-theme', 'dark')
   } else {
     document.documentElement.classList.remove('dark')
+    document.documentElement.style.colorScheme = 'light'
     localStorage.setItem('poker-theme', 'light')
   }
 }

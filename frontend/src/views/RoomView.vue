@@ -15,7 +15,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3H5a2 2 0 00-2 2v14a2 2 0 002 2h4m6-16h4a2 2 0 012 2v14a2 2 0 01-2 2h-4m-6 0V3" />
             </svg>
           </div>
-          <span class="text-slate-950 dark:text-slate-300 font-mono text-xs truncate max-w-[140px] sm:max-w-xs font-bold leading-none" :title="roomId">{{ roomId }}</span>
+          <span class="text-black dark:text-slate-300 font-mono text-xs truncate max-w-[140px] sm:max-w-xs font-black shadow-sm bg-white/50 dark:bg-transparent px-2 py-0.5 rounded" :title="roomId">{{ roomId }}</span>
           <button
             @click="copyInviteLink"
             class="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-900 dark:hover:bg-white/10 text-slate-800 dark:text-slate-400 hover:text-white dark:hover:text-white transition-all border border-slate-300 dark:border-white/5 font-bold"
@@ -29,7 +29,7 @@
             {{ copied ? 'Copiado!' : 'Compartilhar' }}
           </button>
         </div>
-        <div class="flex items-center gap-2 text-[10px] text-slate-950 dark:text-slate-500 uppercase tracking-wider font-extrabold">
+        <div class="flex items-center gap-2 text-[10px] text-black dark:text-slate-500 uppercase tracking-wider font-black">
           <span>{{ userName }}</span>
           <span v-if="isHost" class="text-amber-700 dark:text-yellow-400 font-bold">👑 Host</span>
           <!-- WS status dot -->
@@ -116,9 +116,9 @@
             <!-- Player info -->
             <div class="text-center">
               <span class="flex items-center justify-center gap-1 text-xs font-black leading-tight"
-                :class="user === userName ? 'text-indigo-800 dark:text-indigo-400' : 'text-slate-950 dark:text-slate-300'"
+                :class="user === userName ? 'text-indigo-900 dark:text-indigo-400' : 'text-black dark:text-slate-300'"
               >
-                <span v-if="user === gameState.host" class="text-amber-600 dark:text-yellow-400 tracking-tighter">👑</span>
+                <span v-if="user === gameState.host" class="text-amber-700 dark:text-yellow-400 tracking-tighter">👑</span>
                 {{ user === userName ? 'Você' : user }}
               </span>
               <span v-if="data.voted && !gameState.revealed" class="text-[10px] text-green-600 dark:text-green-400 font-bold tracking-wide uppercase">Votou</span>
@@ -139,7 +139,7 @@
           <template v-if="gameState.revealed && voteAverage !== null">
             <div class="text-center">
               <span class="text-4xl font-black text-white drop-shadow-md">{{ voteAverage }}</span>
-              <p class="text-[10px] text-emerald-400/80 font-bold mt-0.5 tracking-[0.2em] uppercase">média</p>
+              <p class="text-[10px] text-emerald-200 font-bold mt-0.5 tracking-[0.2em] uppercase">média</p>
             </div>
           </template>
           <template v-else-if="gameState.revealed">
@@ -147,10 +147,10 @@
           </template>
           <template v-else>
             <div class="text-center">
-              <p class="text-emerald-500/40 text-sm font-medium">
+              <p class="text-emerald-100 text-sm font-black">
                 {{ Object.values(gameState.users).filter(u => u.voted).length }}/{{ Object.keys(gameState.users).length }}
               </p>
-              <p class="text-emerald-600/30 text-xs">votaram</p>
+              <p class="text-emerald-400/80 text-[10px] font-bold uppercase tracking-widest mt-0.5">votaram</p>
             </div>
           </template>
         </div>
@@ -164,26 +164,26 @@
 
     <!-- Results panel after reveal -->
     <div v-if="gameState.revealed" class="max-w-5xl mx-auto mb-6">
-      <div class="glass rounded-2xl p-6 border-slate-300 dark:border-white/5 shadow-2xl">
-        <h2 class="text-sm font-black text-slate-950 dark:text-slate-300 uppercase tracking-widest mb-4">📊 Resultados</h2>
+      <div class="glass rounded-2xl p-6 border-slate-400 dark:border-white/5 shadow-2xl">
+        <h2 class="text-sm font-black text-black dark:text-slate-300 uppercase tracking-widest mb-4">📊 Resultados</h2>
         <div class="flex flex-wrap gap-2">
           <div
             v-for="(data, user) in gameState.users"
             :key="user"
-            class="flex items-center gap-2 bg-slate-950/5 dark:bg-white/5 rounded-xl px-4 py-2.5 border border-slate-300 dark:border-white/[0.06]"
+            class="flex items-center gap-2 bg-slate-950/5 dark:bg-white/5 rounded-xl px-4 py-2.5 border border-slate-400 dark:border-white/[0.06]"
           >
-            <span v-if="user === gameState.host" class="text-amber-700 dark:text-yellow-400 text-xs">👑</span>
-            <span class="text-sm font-black text-slate-950 dark:text-slate-300">{{ user === userName ? 'Você' : user }}</span>
+            <span v-if="user === gameState.host" class="text-amber-800 dark:text-yellow-400 text-xs">👑</span>
+            <span class="text-sm font-black text-black dark:text-slate-300">{{ user === userName ? 'Você' : user }}</span>
             <span class="font-bold text-sm px-2 py-0.5 rounded-lg"
               :class="data.voted ? 'bg-indigo-500/30 text-indigo-300' : 'bg-white/5 text-slate-600'"
             >{{ data.voted ? data.vote : '—' }}</span>
           </div>
         </div>
-        <div v-if="voteAverage !== null" class="mt-4 pt-4 border-t border-slate-300 dark:border-white/5 flex items-center gap-3">
-          <span class="text-xs font-black text-slate-950 dark:text-slate-500 uppercase tracking-wider">Média</span>
+        <div v-if="voteAverage !== null" class="mt-4 pt-4 border-t border-slate-400 dark:border-white/5 flex items-center gap-3">
+          <span class="text-xs font-black text-black dark:text-slate-500 uppercase tracking-wider">Média</span>
           <span class="text-3xl font-black text-gradient">{{ voteAverage }}</span>
         </div>
-        <p v-if="isHost" class="mt-3 text-[10px] font-black text-slate-950 dark:text-slate-600 uppercase tracking-wide">
+        <p v-if="isHost" class="mt-3 text-[10px] font-black text-black dark:text-slate-600 uppercase tracking-wide">
           Rodada encerrada. Clique em <span class="text-rose-600 dark:text-rose-400">Resetar</span> no topo para recomeçar.
         </p>
       </div>
@@ -191,30 +191,49 @@
 
     <!-- Fixed card deck at bottom -->
     <div v-if="!gameState.revealed" class="fixed bottom-0 left-0 w-full z-20">
-      <div class="glass border-t border-slate-200 dark:border-white/5 px-4 pt-8 pb-5 backdrop-blur-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
-        <div class="max-w-5xl mx-auto flex gap-2.5 overflow-x-auto overflow-y-visible justify-start sm:justify-center custom-scrollbar py-2">
-          <button
-            v-for="card in deck"
-            :key="card"
-            @click="selectCard(card)"
-            class="flex-shrink-0 w-[52px] h-[72px] rounded-xl font-bold text-lg border-2 transition-all duration-200 card-hover select-none"
-            :class="myVote === card
-              ? 'bg-gradient-to-b from-indigo-500 to-indigo-700 border-indigo-500 text-white card-selected shadow-lg shadow-indigo-500/40'
-              : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 border-slate-200 dark:border-white/10 hover:border-indigo-400/60 transition-colors'"
-          >
-            {{ card }}
-          </button>
+      <div class="glass border-t border-slate-300 dark:border-white/10 px-4 pt-10 pb-4 backdrop-blur-3xl shadow-[0_-20px_50px_rgba(0,0,0,0.15)]">
+        <div class="max-w-5xl mx-auto flex flex-col gap-6">
+          <!-- Scrollable Deck Area (Height fixed to prevent clipping) -->
+          <div class="flex gap-2.5 overflow-x-auto overflow-y-visible justify-start sm:justify-center custom-scrollbar h-[110px] items-center px-2">
+            <button
+              v-for="card in deck"
+              :key="card"
+              @click="selectCard(card)"
+              class="flex-shrink-0 w-[52px] h-[72px] rounded-xl font-black text-lg border-2 transition-all duration-200 card-hover select-none"
+              :class="myVote === card
+                ? 'bg-gradient-to-b from-indigo-500 to-indigo-700 border-indigo-600 text-white card-selected shadow-lg shadow-indigo-500/40'
+                : 'bg-white dark:bg-slate-800 text-black dark:text-slate-100 border-slate-300 dark:border-white/10 hover:border-indigo-500/60 transition-colors'"
+            >
+              {{ card }}
+            </button>
+          </div>
+
+          <!-- Footer unified with HomeView -->
+          <footer class="pb-1 text-center">
+            <div class="text-[9px] text-black dark:text-slate-600 uppercase tracking-widest font-black flex flex-col items-center gap-1.5">
+              <div class="flex items-center">
+                <a href="https://github.com/viniciusdocanto/planningpoker" target="_blank" class="hover:text-indigo-800 dark:hover:text-indigo-400 transition-colors">Open Source</a>
+                <span class="mx-2 opacity-50">|</span>
+                <a href="https://docanto.net" target="_blank" class="hover:text-fuchsia-800 dark:hover:text-fuchsia-400 transition-colors font-black underline decoration-fuchsia-500/30 underline-offset-4">Vinicius do Canto</a>
+              </div>
+              <span class="opacity-30 tracking-normal normal-case font-mono text-[8px]">v0.6.5</span>
+            </div>
+          </footer>
         </div>
       </div>
     </div>
 
-    <!-- Footer (Relativo agora para não cortar as cartas) -->
-    <footer class="mt-12 mb-8 text-center px-4">
-      <p class="text-[9px] text-slate-950 dark:text-slate-600 uppercase tracking-[0.2em] font-black">
-        <a href="https://github.com/viniciusdocanto/planningpoker" target="_blank" class="hover:text-indigo-800 dark:hover:text-indigo-400 transition-colors underline decoration-indigo-500/20 underline-offset-4">Portfólio GitHub</a>
-        <span class="mx-2 opacity-50">|</span>
-        <a href="https://docanto.net" target="_blank" class="hover:text-fuchsia-800 dark:hover:text-fuchsia-400 transition-colors font-black tracking-normal">docanto.net</a>
-      </p>
+    <!-- Clean spacer footer for revealed results state (when deck is gone) -->
+    <!-- Clean spacer footer for revealed results state (when deck is gone) -->
+    <footer v-if="gameState.revealed" class="mt-20 mb-10 text-center px-4">
+      <div class="text-[9px] text-black dark:text-slate-600 uppercase tracking-widest font-black flex flex-col items-center gap-1.5">
+        <div class="flex items-center">
+          <a href="https://github.com/viniciusdocanto/planningpoker" target="_blank" class="hover:text-indigo-800 dark:hover:text-indigo-400 transition-colors">Open Source</a>
+          <span class="mx-2 opacity-50">|</span>
+          <a href="https://docanto.net" target="_blank" class="hover:text-fuchsia-800 dark:hover:text-fuchsia-400 transition-colors font-black underline decoration-fuchsia-500/30 underline-offset-4">Vinicius do Canto</a>
+        </div>
+        <span class="opacity-30 tracking-normal normal-case font-mono text-[8px]">v0.6.5</span>
+      </div>
     </footer>
 
   </div>
@@ -245,7 +264,7 @@ const wsStatus = ref('connecting')
 let ws = null
 let reconnectTimer = null
 
-const isHost = computed(() => gameState.value.host === userName)
+const isHost = computed(() => gameState.value.host === userName.value)
 
 const voteAverage = computed(() => {
   if (!gameState.value.revealed) return null

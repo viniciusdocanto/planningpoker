@@ -14,7 +14,7 @@
         </svg>
       </div>
       <h1 class="text-5xl font-extrabold tracking-tight text-gradient mb-3">Planning Poker</h1>
-      <p class="text-slate-950 dark:text-slate-400 text-lg max-w-sm font-bold">
+      <p class="text-black dark:text-slate-400 text-lg max-w-sm font-black">
         Estime tarefas com seu time em tempo real, de forma simples e divertida.
       </p>
     </div>
@@ -31,39 +31,39 @@
             </svg>
           </div>
           <div class="min-w-0">
-            <p class="text-[10px] text-indigo-700 dark:text-indigo-400 font-black uppercase tracking-wider mb-0.5">Entrando na sala</p>
-            <p class="text-slate-950 dark:text-white font-mono text-sm truncate" :title="roomId">{{ roomId }}</p>
+            <p class="text-[10px] text-indigo-800 dark:text-indigo-400 font-black uppercase tracking-wider mb-0.5">Entrando na sala</p>
+            <p class="text-black dark:text-white font-mono text-sm truncate" :title="roomId">{{ roomId }}</p>
           </div>
         </div>
       </template>
 
       <template v-else>
-        <h2 class="text-xl font-black text-slate-950 dark:text-white mb-6">Entrar ou criar sala</h2>
+        <h2 class="text-xl font-black text-black dark:text-white mb-6">Entrar ou criar sala</h2>
       </template>
 
       <div class="space-y-4">
         <!-- Name Input -->
         <div>
-          <label class="block text-xs font-black text-slate-700 dark:text-slate-400 uppercase tracking-wider mb-2">Seu nome</label>
+          <label class="block text-xs font-black text-black dark:text-slate-400 uppercase tracking-wider mb-2">Seu nome</label>
           <input
             v-model="userName"
             type="text"
             placeholder="Como devemos te chamar?"
             autofocus
             @keyup.enter="handleAction"
-            class="w-full bg-slate-950/5 dark:bg-white/5 border border-slate-400 dark:border-white/10 rounded-xl px-4 py-3.5 text-slate-950 dark:text-white placeholder-slate-600 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500/40 transition-all text-sm font-bold"
+            class="w-full bg-slate-950/5 dark:bg-white/5 border border-slate-500 dark:border-white/10 rounded-xl px-4 py-3.5 text-black dark:text-white placeholder-slate-700 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500/40 transition-all text-sm font-black"
           >
         </div>
 
         <!-- Room ID Input (only if NOT joining via link) -->
         <div v-if="!isJoiningViaLink">
-          <label class="block text-xs font-black text-slate-700 dark:text-slate-400 uppercase tracking-wider mb-2">ID da sala <span class="normal-case font-normal text-slate-600 dark:text-slate-500">(opcional)</span></label>
+          <label class="block text-xs font-black text-black dark:text-slate-400 uppercase tracking-wider mb-2">ID da sala <span class="normal-case font-normal text-slate-700 dark:text-slate-500">(opcional)</span></label>
           <input
             v-model="roomId"
             type="text"
             placeholder="Deixe em branco para criar uma nova"
             @keyup.enter="handleAction"
-            class="w-full bg-slate-950/5 dark:bg-white/5 border border-slate-400 dark:border-white/10 rounded-xl px-4 py-3.5 text-slate-950 dark:text-white placeholder-slate-600 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500/40 transition-all text-sm font-bold"
+            class="w-full bg-slate-950/5 dark:bg-white/5 border border-slate-500 dark:border-white/10 rounded-xl px-4 py-3.5 text-black dark:text-white placeholder-slate-700 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500/40 transition-all text-sm font-black"
           >
         </div>
 
@@ -88,10 +88,13 @@
     </div>
 
     <!-- Footer -->
-    <div class="mt-8 text-[10px] text-slate-950 dark:text-slate-600 uppercase tracking-widest font-black">
-      <a href="https://github.com/viniciusdocanto/planningpoker" target="_blank" class="hover:text-indigo-700 dark:hover:text-indigo-400 transition-colors">Open Source</a>
-      <span class="mx-2 opacity-40">|</span>
-      por <a href="https://docanto.net" target="_blank" class="hover:text-fuchsia-700 dark:hover:text-fuchsia-400 transition-colors font-black underline decoration-fuchsia-500/30 underline-offset-4">Vinicius do Canto</a>
+    <div class="mt-8 text-[10px] text-black dark:text-slate-600 uppercase tracking-widest font-black flex flex-col items-center gap-1.5">
+      <div class="flex items-center">
+        <a href="https://github.com/viniciusdocanto/planningpoker" target="_blank" class="hover:text-indigo-800 dark:hover:text-indigo-400 transition-colors">Open Source</a>
+        <span class="mx-2 opacity-50">|</span>
+        <a href="https://docanto.net" target="_blank" class="hover:text-fuchsia-800 dark:hover:text-fuchsia-400 transition-colors font-black underline decoration-fuchsia-500/30 underline-offset-4">Vinicius do Canto</a>
+      </div>
+      <span class="opacity-30 tracking-normal normal-case font-mono text-[8px]">v0.6.5</span>
     </div>
   </div>
 </template>

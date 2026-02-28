@@ -4,15 +4,14 @@
 
 :root {
     --bg-color: #f8fafc;
-    --text-color: #020617;
-    /* Slate 950 */
-    --glass-bg: rgba(255, 255, 255, 0.7);
-    --glass-border: rgba(0, 0, 0, 0.08);
-    --glass-hover-bg: rgba(255, 255, 255, 0.85);
+    --text-color: #000000;
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(0, 0, 0, 0.12);
+    --glass-hover-bg: rgba(255, 255, 255, 0.95);
     --radial-opacity: 0.08;
     --scrollbar-track: rgba(0, 0, 0, 0.03);
     --scrollbar-thumb: rgba(0, 0, 0, 0.15);
-    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.05), 0 2px 8px rgba(0, 0, 0, 0.05);
+    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .dark {
