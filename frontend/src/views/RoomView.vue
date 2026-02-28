@@ -2,60 +2,65 @@
   <div class="min-h-screen pb-36 px-4 pt-4 relative">
 
     <!-- Header -->
-    <header class="glass rounded-2xl px-5 py-4 mb-6 flex justify-between items-center max-w-5xl mx-auto">
+    <header class="glass rounded-2xl px-5 py-4 mb-6 flex justify-between items-center max-w-5xl mx-auto border-white/10 dark:border-white/5">
       <!-- Left: Room info -->
       <div class="flex flex-col gap-0.5 min-w-0">
         <div class="flex items-center gap-2 flex-wrap">
           <!-- Planning Poker logo small -->
-          <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-fuchsia-500 flex items-center justify-center shrink-0">
+          <div 
+            @click="router.push('/')"
+            class="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-fuchsia-500 flex items-center justify-center shrink-0 cursor-pointer hover:scale-105 transition-transform"
+          >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3H5a2 2 0 00-2 2v14a2 2 0 002 2h4m6-16h4a2 2 0 012 2v14a2 2 0 01-2 2h-4m-6 0V3" />
             </svg>
           </div>
-          <span class="text-slate-300 font-mono text-xs truncate max-w-[140px] sm:max-w-xs" :title="roomId">{{ roomId }}</span>
+          <span class="text-slate-600 dark:text-slate-300 font-mono text-xs truncate max-w-[140px] sm:max-w-xs" :title="roomId">{{ roomId }}</span>
           <button
             @click="copyInviteLink"
-            class="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg glass-hover text-slate-400 hover:text-white transition-all"
+            class="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition-all border border-slate-200 dark:border-white/5"
           >
             <svg v-if="!copied" xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
             </svg>
-            <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+            <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-green-500 dark:text-green-400" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
             </svg>
-            {{ copied ? 'Copiado!' : 'Copiar link' }}
+            {{ copied ? 'Copiado!' : 'Compartilhar' }}
           </button>
         </div>
-        <div class="flex items-center gap-2 text-xs text-slate-500">
-          <span>Jogando como <span class="text-indigo-400 font-semibold">{{ userName }}</span></span>
-          <span v-if="isHost" class="text-yellow-400">· 👑 Host</span>
+        <div class="flex items-center gap-2 text-[10px] text-slate-500 uppercase tracking-wider font-medium">
+          <span>{{ userName }}</span>
+          <span v-if="isHost" class="text-amber-600 dark:text-yellow-400 font-bold">👑 Host</span>
           <!-- WS status dot -->
-          <span class="flex items-center gap-1" :class="wsStatus === 'connected' ? 'text-green-500' : 'text-yellow-500 animate-pulse-soft'">
-            · <span class="w-1.5 h-1.5 rounded-full inline-block" :class="wsStatus === 'connected' ? 'bg-green-500' : 'bg-yellow-500'"></span>
-            {{ wsStatus === 'connected' ? 'Conectado' : 'Reconectando...' }}
+          <span class="flex items-center gap-1" :class="wsStatus === 'connected' ? 'text-green-600 dark:text-green-500' : 'text-amber-600 dark:text-yellow-500 animate-pulse-soft'">
+            · <span class="w-1.5 h-1.5 rounded-full inline-block" :class="wsStatus === 'connected' ? 'bg-green-600 dark:bg-green-500' : 'bg-amber-600 dark:bg-yellow-500'"></span>
+            {{ wsStatus === 'connected' ? 'OK' : '...' }}
           </span>
         </div>
       </div>
 
       <!-- Right: Actions -->
       <div class="flex items-center gap-2 shrink-0">
+        <ThemeToggle class="scale-90" />
+        <div class="w-[1px] h-6 bg-slate-200 dark:bg-white/10 mx-1 hidden sm:block"></div>
         <button
           v-if="isHost && !gameState.revealed"
           @click="revealVotes"
-          class="bg-gradient-to-r from-indigo-500 to-purple-500 hover:opacity-90 text-white text-sm font-semibold px-5 py-2 rounded-xl transition-all shadow-lg shadow-indigo-500/20"
+          class="bg-gradient-to-r from-indigo-500 to-purple-500 hover:opacity-90 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-lg shadow-indigo-500/20"
         >
-          Revelar 🎴
+          Revelar
         </button>
         <button
           v-if="isHost && gameState.revealed"
           @click="resetVotes"
-          class="bg-gradient-to-r from-rose-500 to-pink-500 hover:opacity-90 text-white text-sm font-semibold px-5 py-2 rounded-xl transition-all shadow-lg shadow-rose-500/20"
+          class="bg-gradient-to-r from-rose-500 to-pink-500 hover:opacity-90 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-lg shadow-rose-500/20"
         >
-          Nova rodada 🔄
+          Resetar
         </button>
         <button
           @click="leaveRoom"
-          class="glass glass-hover text-slate-400 hover:text-white text-sm px-4 py-2 rounded-xl transition-all"
+          class="bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white text-xs font-bold px-3 py-2 rounded-xl transition-all border border-slate-200 dark:border-white/5"
         >
           Sair
         </button>
@@ -110,15 +115,15 @@
 
             <!-- Player info -->
             <div class="text-center">
-              <span class="flex items-center justify-center gap-1 text-xs font-medium"
-                :class="user === userName ? 'text-indigo-400' : 'text-slate-300'"
+              <span class="flex items-center justify-center gap-1 text-xs font-bold leading-tight"
+                :class="user === userName ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-700 dark:text-slate-300'"
               >
-                <span v-if="user === gameState.host" class="text-yellow-400">👑</span>
+                <span v-if="user === gameState.host" class="text-amber-600 dark:text-yellow-400 tracking-tighter">👑</span>
                 {{ user === userName ? 'Você' : user }}
               </span>
-              <span v-if="data.voted && !gameState.revealed" class="text-[10px] text-green-400 font-semibold tracking-wide uppercase">Votou</span>
-              <span v-if="!data.voted && !gameState.revealed" class="text-[10px] text-yellow-500/80 tracking-wide">pensando...</span>
-              <span v-if="gameState.revealed && !data.voted" class="text-[10px] text-slate-600">não votou</span>
+              <span v-if="data.voted && !gameState.revealed" class="text-[10px] text-green-600 dark:text-green-400 font-bold tracking-wide uppercase">Votou</span>
+              <span v-if="!data.voted && !gameState.revealed" class="text-[10px] text-amber-600/80 dark:text-yellow-500/80 font-medium tracking-wide">pensando...</span>
+              <span v-if="gameState.revealed && !data.voted" class="text-[10px] text-slate-500 dark:text-slate-600">não votou</span>
             </div>
           </div>
         </div>
@@ -133,12 +138,12 @@
           <div class="absolute inset-3 rounded-full border border-emerald-600/20 pointer-events-none"></div>
           <template v-if="gameState.revealed && voteAverage !== null">
             <div class="text-center">
-              <span class="text-4xl font-black text-white drop-shadow-lg">{{ voteAverage }}</span>
-              <p class="text-xs text-emerald-400/70 font-medium mt-0.5 tracking-wider uppercase">média</p>
+              <span class="text-4xl font-black text-white drop-shadow-md">{{ voteAverage }}</span>
+              <p class="text-[10px] text-emerald-400/80 font-bold mt-0.5 tracking-[0.2em] uppercase">média</p>
             </div>
           </template>
           <template v-else-if="gameState.revealed">
-            <span class="text-emerald-500/50 text-sm font-medium">Sem votos</span>
+            <span class="text-emerald-500/60 text-xs font-bold uppercase tracking-widest">Sem votos</span>
           </template>
           <template v-else>
             <div class="text-center">
@@ -194,8 +199,8 @@
             @click="selectCard(card)"
             class="flex-shrink-0 w-[52px] h-[72px] rounded-xl font-bold text-lg border-2 transition-all duration-200 card-hover select-none"
             :class="myVote === card
-              ? 'bg-gradient-to-b from-indigo-400 to-indigo-600 border-indigo-400 text-white card-selected shadow-[0_0_20px_rgba(99,102,241,0.6)]'
-              : 'bg-white text-gray-800 border-gray-200/20 hover:border-indigo-400/60'"
+              ? 'bg-gradient-to-b from-indigo-500 to-indigo-700 border-indigo-500 text-white card-selected shadow-lg shadow-indigo-500/40'
+              : 'bg-white dark:bg-white text-gray-800 border-gray-200 dark:border-white/10 hover:border-indigo-400/60'"
           >
             {{ card }}
           </button>
@@ -219,12 +224,17 @@
 // Planning Poker - RoomView - MIT License - (c) 2026 Vinicius do Canto
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import ThemeToggle from '../components/ThemeToggle.vue'
 
 const route = useRoute()
 const router = useRouter()
+const roomId = ref(route.params.id)
+const userName = ref(sessionStorage.getItem('playerName') || localStorage.getItem('poker-player-name') || '')
 
-const roomId = route.params.id
-const userName = sessionStorage.getItem('playerName')
+// Redirect if no name
+if (!userName.value) {
+  router.push(`/?room=${roomId.value}`)
+}
 const deck = ['0', '½', '1', '2', '3', '5', '8', '13', '21', '34', '55', '89', '?', '☕']
 
 const gameState = ref({ users: {}, revealed: false, host: null })

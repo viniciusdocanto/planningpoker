@@ -1,6 +1,11 @@
 <template>
   <div class="min-h-screen flex flex-col items-center justify-center p-4 relative">
 
+    <!-- Theme Toggle -->
+    <div class="fixed top-6 right-6 z-50">
+      <ThemeToggle />
+    </div>
+
     <!-- Logo + Tagline -->
     <div class="text-center mb-10 animate-float">
       <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-5 bg-gradient-to-br from-indigo-500 via-purple-500 to-fuchsia-500 shadow-lg glow-purple">
@@ -9,56 +14,56 @@
         </svg>
       </div>
       <h1 class="text-5xl font-extrabold tracking-tight text-gradient mb-3">Planning Poker</h1>
-      <p class="text-slate-400 text-lg max-w-sm">
+      <p class="text-slate-500 dark:text-slate-400 text-lg max-w-sm">
         Estime tarefas com seu time em tempo real, de forma simples e divertida.
       </p>
     </div>
 
     <!-- Card -->
-    <div class="glass rounded-3xl p-8 w-full max-w-md card-shadow">
+    <div class="glass rounded-3xl p-8 w-full max-w-md card-shadow border-white/10 dark:border-white/5">
 
       <!-- Join via link - special state -->
       <template v-if="isJoiningViaLink">
         <div class="flex items-center gap-3 mb-6 p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/20">
           <div class="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
           </div>
           <div class="min-w-0">
-            <p class="text-xs text-indigo-400 font-semibold uppercase tracking-wider mb-0.5">Entrando na sala</p>
-            <p class="text-white font-mono text-sm truncate" :title="roomId">{{ roomId }}</p>
+            <p class="text-[10px] text-indigo-500 dark:text-indigo-400 font-bold uppercase tracking-wider mb-0.5">Entrando na sala</p>
+            <p class="text-slate-800 dark:text-white font-mono text-sm truncate" :title="roomId">{{ roomId }}</p>
           </div>
         </div>
       </template>
 
       <template v-else>
-        <h2 class="text-xl font-bold text-white mb-6">Entrar ou criar sala</h2>
+        <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-6">Entrar ou criar sala</h2>
       </template>
 
       <div class="space-y-4">
         <!-- Name Input -->
         <div>
-          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Seu nome</label>
+          <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Seu nome</label>
           <input
             v-model="userName"
             type="text"
             placeholder="Como devemos te chamar?"
             autofocus
             @keyup.enter="handleAction"
-            class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500/40 transition-all text-sm"
+            class="w-full bg-slate-900/5 dark:bg-white/5 border border-slate-900/10 dark:border-white/10 rounded-xl px-4 py-3.5 text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500/40 transition-all text-sm"
           >
         </div>
 
         <!-- Room ID Input (only if NOT joining via link) -->
         <div v-if="!isJoiningViaLink">
-          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">ID da sala <span class="normal-case font-normal text-slate-500">(opcional)</span></label>
+          <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">ID da sala <span class="normal-case font-normal text-slate-400 dark:text-slate-500">(opcional)</span></label>
           <input
             v-model="roomId"
             type="text"
             placeholder="Deixe em branco para criar uma nova"
             @keyup.enter="handleAction"
-            class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500/40 transition-all text-sm"
+            class="w-full bg-slate-900/5 dark:bg-white/5 border border-slate-900/10 dark:border-white/10 rounded-xl px-4 py-3.5 text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500/40 transition-all text-sm"
           >
         </div>
 
@@ -95,6 +100,7 @@
 // Planning Poker - HomeView - MIT License - (c) 2026 Vinicius do Canto
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import ThemeToggle from '../components/ThemeToggle.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -112,6 +118,10 @@ const isNameValid = computed(() =>
 )
 
 onMounted(() => {
+  // Load saved name
+  const savedName = localStorage.getItem('poker-player-name')
+  if (savedName) userName.value = savedName
+
   if (route.query.room) {
     const roomParam = String(route.query.room)
     if (VALID_ROOM_RE.test(roomParam)) {
@@ -147,7 +157,11 @@ const handleAction = () => {
   }
 
   const targetRoom = customRoom || generateRandomId(20)
+  
+  // Persist name
+  localStorage.setItem('poker-player-name', name)
   sessionStorage.setItem('playerName', name)
+  
   router.push(`/room/${targetRoom}`)
 }
 </script>
