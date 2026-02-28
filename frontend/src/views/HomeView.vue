@@ -14,13 +14,13 @@
         </svg>
       </div>
       <h1 class="text-5xl font-extrabold tracking-tight text-gradient mb-3">Planning Poker</h1>
-      <p class="text-slate-600 dark:text-slate-400 text-lg max-w-sm">
+      <p class="text-slate-800 dark:text-slate-400 text-lg max-w-sm font-medium">
         Estime tarefas com seu time em tempo real, de forma simples e divertida.
       </p>
     </div>
 
     <!-- Card -->
-    <div class="glass rounded-3xl p-8 w-full max-w-md card-shadow border-slate-900/5 dark:border-white/5">
+    <div class="glass rounded-3xl p-8 w-full max-w-md card-shadow border-slate-200 dark:border-white/5">
 
       <!-- Join via link - special state -->
       <template v-if="isJoiningViaLink">
@@ -44,26 +44,26 @@
       <div class="space-y-4">
         <!-- Name Input -->
         <div>
-          <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Seu nome</label>
+          <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">Seu nome</label>
           <input
             v-model="userName"
             type="text"
             placeholder="Como devemos te chamar?"
             autofocus
             @keyup.enter="handleAction"
-            class="w-full bg-slate-900/5 dark:bg-white/5 border border-slate-900/10 dark:border-white/10 rounded-xl px-4 py-3.5 text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500/40 transition-all text-sm"
+            class="w-full bg-slate-900/5 dark:bg-white/5 border border-slate-300 dark:border-white/10 rounded-xl px-4 py-3.5 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500/40 transition-all text-sm"
           >
         </div>
 
         <!-- Room ID Input (only if NOT joining via link) -->
         <div v-if="!isJoiningViaLink">
-          <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">ID da sala <span class="normal-case font-normal text-slate-400 dark:text-slate-500">(opcional)</span></label>
+          <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">ID da sala <span class="normal-case font-normal text-slate-500 dark:text-slate-500">(opcional)</span></label>
           <input
             v-model="roomId"
             type="text"
             placeholder="Deixe em branco para criar uma nova"
             @keyup.enter="handleAction"
-            class="w-full bg-slate-900/5 dark:bg-white/5 border border-slate-900/10 dark:border-white/10 rounded-xl px-4 py-3.5 text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500/40 transition-all text-sm"
+            class="w-full bg-slate-900/5 dark:bg-white/5 border border-slate-300 dark:border-white/10 rounded-xl px-4 py-3.5 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500/40 transition-all text-sm"
           >
         </div>
 
@@ -88,10 +88,10 @@
     </div>
 
     <!-- Footer -->
-    <div class="mt-8 text-[10px] text-slate-500 dark:text-slate-600 uppercase tracking-widest font-bold">
-      <a href="https://github.com/viniciusdocanto/planningpoker" target="_blank" class="hover:text-indigo-400 transition-colors">Open Source</a>
-      <span class="mx-2 opacity-20">|</span>
-      por <a href="https://docanto.net" target="_blank" class="hover:text-fuchsia-400 transition-colors font-bold">Vinicius do Canto</a>
+    <div class="mt-8 text-[10px] text-slate-800 dark:text-slate-600 uppercase tracking-widest font-bold">
+      <a href="https://github.com/viniciusdocanto/planningpoker" target="_blank" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Open Source</a>
+      <span class="mx-2 opacity-30">|</span>
+      por <a href="https://docanto.net" target="_blank" class="hover:text-fuchsia-600 dark:hover:text-fuchsia-400 transition-colors font-black">Vinicius do Canto</a>
     </div>
   </div>
 </template>

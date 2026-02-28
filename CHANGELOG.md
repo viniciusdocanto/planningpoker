@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.6.2] - 2026-02-28
+
+### Corrigido
+- **Interface:** Refactor completo das cores do Modo Claro para contraste máximo e melhor acessibilidade.
+- **Interface:** Rodapé da sala movido para o final da página (posição relativa) para evitar sobreposição com as cartas selecionadas.
+- **Design:** Ajustes de bordas, placeholders e labels para maior nitidez em telas claras.
+
+---
+
 ## [0.6.1] - 2026-02-28
 
 ### Corrigido
