@@ -211,7 +211,7 @@
                 <span class="mx-2 opacity-50">|</span>
                 <a href="https://docanto.net" target="_blank" class="hover:text-fuchsia-800 dark:hover:text-fuchsia-400 transition-colors font-black underline decoration-fuchsia-500/30 underline-offset-4">Vinicius do Canto</a>
               </div>
-              <span class="opacity-30 tracking-normal normal-case font-mono text-[8px]">v0.7.0</span>
+              <span class="opacity-30 tracking-normal normal-case font-mono text-[8px]">v0.7.1</span>
             </div>
           </footer>
         </div>
@@ -227,7 +227,7 @@
           <span class="mx-2 opacity-50">|</span>
           <a href="https://docanto.net" target="_blank" class="hover:text-fuchsia-800 dark:hover:text-fuchsia-400 transition-colors font-black underline decoration-fuchsia-500/30 underline-offset-4">Vinicius do Canto</a>
         </div>
-        <span class="opacity-30 tracking-normal normal-case font-mono text-[8px]">v0.7.0</span>
+        <span class="opacity-30 tracking-normal normal-case font-mono text-[8px]">v0.7.1</span>
       </div>
     </footer>
 
@@ -282,7 +282,7 @@ const connect = () => {
       const msg = JSON.parse(e.data)
       if (msg.type === 'state_update') {
         gameState.value = msg.data
-        if (gameState.value.users[userName] && !gameState.value.users[userName].voted) myVote.value = null
+        if (gameState.value.users[userName.value] && !gameState.value.users[userName.value].voted) myVote.value = null
       }
     } catch (err) {
       console.warn('Received invalid message from server:', err)
@@ -307,6 +307,13 @@ const copyInviteLink = async () => {
 const selectCard = (card) => {
   myVote.value = card
   if (ws?.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ action: 'vote', value: card }))
+}
+const handleAction = () => {
+  if (gameState.value.revealed) {
+    resetVotes()
+  } else {
+    revealVotes()
+  }
 }
 const revealVotes = () => { if (ws?.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ action: 'reveal' })) }
 const resetVotes = () => { if (ws?.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ action: 'reset' })) }

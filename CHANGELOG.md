@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.7.1] - 2026-02-28
+### Fixed
+- **Botão Revelar/Resetar:** Restaurada a funcionalidade do botão de ação do host através da implementação da função `handleAction` em `RoomView.vue`.
+- **Ref Bug:** Corrigido erro de referência no manipulador de mensagens WebSocket onde o `userName` (ref) estava sendo usado sem `.value`.
+- **Estabilidade do Build:** Resolvidos erros de referência que impediam o build de produção com sucesso.
+
 ## [0.7.0] - 2026-02-28
 ### Fixed
 - **Corte de Sombras (Shadow Clipping):** Removido padding excessivo e aumentada a altura dos containers de cards (deck e grid de jogadores), garantindo que os efeitos de `hover` e seleção não sejam cortados.
