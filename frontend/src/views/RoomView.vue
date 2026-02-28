@@ -76,7 +76,7 @@
 
       <template v-else>
         <!-- Players arranged above and below the table oval -->
-        <div class="w-full flex flex-wrap justify-center gap-8 mb-10">
+        <div class="w-full flex flex-wrap justify-center gap-8 mb-10 pt-10">
           <div
             v-for="(data, user) in gameState.users"
             :key="user"
@@ -125,12 +125,12 @@
 
         <!-- Oval poker table center -->
         <div class="relative w-72 h-36 rounded-full flex items-center justify-center
-          bg-gradient-to-b from-emerald-900/60 to-emerald-950/80
-          border-4 border-emerald-700/40
-          shadow-[0_0_60px_rgba(16,185,129,0.15),inset_0_2px_20px_rgba(0,0,0,0.4)]
+          bg-slate-200/50 dark:bg-gradient-to-b dark:from-emerald-900/60 dark:to-emerald-950/80
+          border-4 border-slate-300 dark:border-emerald-700/40
+          shadow-[0_10px_40px_rgba(0,0,0,0.05),inset_0_2px_10px_rgba(0,0,0,0.05)] dark:shadow-[0_0_60px_rgba(16,185,129,0.15),inset_0_2px_20px_rgba(0,0,0,0.4)]
           mb-10"
         >
-          <div class="absolute inset-3 rounded-full border border-emerald-600/20 pointer-events-none"></div>
+          <div class="absolute inset-3 rounded-full border border-slate-300/50 dark:border-emerald-600/20 pointer-events-none"></div>
           <template v-if="gameState.revealed && voteAverage !== null">
             <div class="text-center">
               <span class="text-4xl font-black text-white drop-shadow-md">{{ voteAverage }}</span>
@@ -138,14 +138,14 @@
             </div>
           </template>
           <template v-else-if="gameState.revealed">
-            <span class="text-emerald-500/60 text-xs font-bold uppercase tracking-widest">Sem votos</span>
+            <span class="text-slate-400 dark:text-emerald-500/60 text-xs font-bold uppercase tracking-widest">Sem votos</span>
           </template>
           <template v-else>
             <div class="text-center">
-              <p class="text-white dark:text-emerald-100 text-sm font-black drop-shadow-sm">
+              <p class="text-indigo-600 dark:text-white text-sm font-black drop-shadow-sm">
                 {{ Object.values(gameState.users).filter(u => u.voted).length }}/{{ Object.keys(gameState.users).length }}
               </p>
-              <p class="text-emerald-300 dark:text-emerald-400/80 text-[10px] font-bold uppercase tracking-widest mt-0.5">votaram</p>
+              <p class="text-slate-500 dark:text-emerald-300 text-[10px] font-bold uppercase tracking-widest mt-0.5">votaram</p>
             </div>
           </template>
         </div>
@@ -186,10 +186,10 @@
 
     <!-- Fixed card deck at bottom -->
     <div v-if="!gameState.revealed" class="fixed bottom-0 left-0 w-full z-20">
-      <div class="glass border-t border-slate-300 dark:border-white/10 px-4 pt-10 pb-4 backdrop-blur-3xl shadow-[0_-20px_50px_rgba(0,0,0,0.15)]">
+      <div class="glass border-t border-slate-300 dark:border-white/10 px-4 pt-2 pb-4 backdrop-blur-3xl shadow-[0_-20px_50px_rgba(0,0,0,0.15)]">
         <div class="max-w-5xl mx-auto flex flex-col gap-6">
           <!-- Scrollable Deck Area (Height fixed to prevent clipping) -->
-          <div class="flex gap-2.5 overflow-x-auto overflow-y-visible justify-start sm:justify-center custom-scrollbar h-[110px] items-center px-2">
+          <div class="flex gap-2.5 overflow-x-auto overflow-y-visible justify-start sm:justify-center custom-scrollbar h-[130px] items-center px-2">
             <button
               v-for="card in deck"
               :key="card"
@@ -211,7 +211,7 @@
                 <span class="mx-2 opacity-50">|</span>
                 <a href="https://docanto.net" target="_blank" class="hover:text-fuchsia-800 dark:hover:text-fuchsia-400 transition-colors font-black underline decoration-fuchsia-500/30 underline-offset-4">Vinicius do Canto</a>
               </div>
-              <span class="opacity-30 tracking-normal normal-case font-mono text-[8px]">v0.6.9</span>
+              <span class="opacity-30 tracking-normal normal-case font-mono text-[8px]">v0.7.0</span>
             </div>
           </footer>
         </div>
@@ -227,7 +227,7 @@
           <span class="mx-2 opacity-50">|</span>
           <a href="https://docanto.net" target="_blank" class="hover:text-fuchsia-800 dark:hover:text-fuchsia-400 transition-colors font-black underline decoration-fuchsia-500/30 underline-offset-4">Vinicius do Canto</a>
         </div>
-        <span class="opacity-30 tracking-normal normal-case font-mono text-[8px]">v0.6.9</span>
+        <span class="opacity-30 tracking-normal normal-case font-mono text-[8px]">v0.7.0</span>
       </div>
     </footer>
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.7.0] - 2026-02-28
+### Fixed
+- **Corte de Sombras (Shadow Clipping):** Removido padding excessivo e aumentada a altura dos containers de cards (deck e grid de jogadores), garantindo que os efeitos de `hover` e seleção não sejam cortados.
+- **Mesa de Poker (Tema Claro):** Redesenhada a mesa no modo claro com um visual "Slate/Neutral" mais limpo e profissional, melhorando o contraste dos textos centrais.
+
 ## [0.6.9] - 2026-02-28
 ### Fixed
 - **UI da Sala (Room UI):** Corrigida a visibilidade dos espaços de cartas (placeholders) no modo claro, utilizando bordas e fundo contrastantes.
