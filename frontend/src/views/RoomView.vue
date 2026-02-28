@@ -15,10 +15,10 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3H5a2 2 0 00-2 2v14a2 2 0 002 2h4m6-16h4a2 2 0 012 2v14a2 2 0 01-2 2h-4m-6 0V3" />
             </svg>
           </div>
-          <span class="text-slate-900 dark:text-slate-300 font-mono text-xs truncate max-w-[140px] sm:max-w-xs" :title="roomId">{{ roomId }}</span>
+          <span class="text-slate-950 dark:text-slate-300 font-mono text-xs truncate max-w-[140px] sm:max-w-xs font-bold leading-none" :title="roomId">{{ roomId }}</span>
           <button
             @click="copyInviteLink"
-            class="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all border border-slate-200 dark:border-white/5"
+            class="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-900 dark:hover:bg-white/10 text-slate-800 dark:text-slate-400 hover:text-white dark:hover:text-white transition-all border border-slate-300 dark:border-white/5 font-bold"
           >
             <svg v-if="!copied" xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -29,7 +29,7 @@
             {{ copied ? 'Copiado!' : 'Compartilhar' }}
           </button>
         </div>
-        <div class="flex items-center gap-2 text-[10px] text-slate-900 dark:text-slate-500 uppercase tracking-wider font-extrabold">
+        <div class="flex items-center gap-2 text-[10px] text-slate-950 dark:text-slate-500 uppercase tracking-wider font-extrabold">
           <span>{{ userName }}</span>
           <span v-if="isHost" class="text-amber-700 dark:text-yellow-400 font-bold">👑 Host</span>
           <!-- WS status dot -->
@@ -60,7 +60,7 @@
         </button>
         <button
           @click="leaveRoom"
-          class="bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white text-xs font-bold px-3 py-2 rounded-xl transition-all border border-slate-200 dark:border-white/5"
+          class="bg-slate-100 dark:bg-white/5 hover:bg-slate-900 dark:hover:bg-white/10 text-slate-800 dark:text-slate-400 hover:text-white dark:hover:text-white text-xs font-black px-3 py-2 rounded-xl transition-all border border-slate-300 dark:border-white/5"
         >
           Sair
         </button>
@@ -116,7 +116,7 @@
             <!-- Player info -->
             <div class="text-center">
               <span class="flex items-center justify-center gap-1 text-xs font-black leading-tight"
-                :class="user === userName ? 'text-indigo-700 dark:text-indigo-400' : 'text-slate-900 dark:text-slate-300'"
+                :class="user === userName ? 'text-indigo-800 dark:text-indigo-400' : 'text-slate-950 dark:text-slate-300'"
               >
                 <span v-if="user === gameState.host" class="text-amber-600 dark:text-yellow-400 tracking-tighter">👑</span>
                 {{ user === userName ? 'Você' : user }}
@@ -164,26 +164,26 @@
 
     <!-- Results panel after reveal -->
     <div v-if="gameState.revealed" class="max-w-5xl mx-auto mb-6">
-      <div class="glass rounded-2xl p-6 border-slate-200 dark:border-white/5 shadow-xl">
-        <h2 class="text-sm font-black text-slate-800 dark:text-slate-300 uppercase tracking-widest mb-4">📊 Resultados</h2>
+      <div class="glass rounded-2xl p-6 border-slate-300 dark:border-white/5 shadow-2xl">
+        <h2 class="text-sm font-black text-slate-950 dark:text-slate-300 uppercase tracking-widest mb-4">📊 Resultados</h2>
         <div class="flex flex-wrap gap-2">
           <div
             v-for="(data, user) in gameState.users"
             :key="user"
-            class="flex items-center gap-2 bg-slate-900/5 dark:bg-white/5 rounded-xl px-4 py-2.5 border border-slate-200 dark:border-white/[0.06]"
+            class="flex items-center gap-2 bg-slate-950/5 dark:bg-white/5 rounded-xl px-4 py-2.5 border border-slate-300 dark:border-white/[0.06]"
           >
-            <span v-if="user === gameState.host" class="text-amber-600 dark:text-yellow-400 text-xs">👑</span>
-            <span class="text-sm font-bold text-slate-800 dark:text-slate-300">{{ user === userName ? 'Você' : user }}</span>
+            <span v-if="user === gameState.host" class="text-amber-700 dark:text-yellow-400 text-xs">👑</span>
+            <span class="text-sm font-black text-slate-950 dark:text-slate-300">{{ user === userName ? 'Você' : user }}</span>
             <span class="font-bold text-sm px-2 py-0.5 rounded-lg"
               :class="data.voted ? 'bg-indigo-500/30 text-indigo-300' : 'bg-white/5 text-slate-600'"
             >{{ data.voted ? data.vote : '—' }}</span>
           </div>
         </div>
-        <div v-if="voteAverage !== null" class="mt-4 pt-4 border-t border-slate-200 dark:border-white/5 flex items-center gap-3">
-          <span class="text-xs font-bold text-slate-500 dark:text-slate-500 uppercase tracking-wider">Média</span>
+        <div v-if="voteAverage !== null" class="mt-4 pt-4 border-t border-slate-300 dark:border-white/5 flex items-center gap-3">
+          <span class="text-xs font-black text-slate-950 dark:text-slate-500 uppercase tracking-wider">Média</span>
           <span class="text-3xl font-black text-gradient">{{ voteAverage }}</span>
         </div>
-        <p v-if="isHost" class="mt-3 text-[10px] font-bold text-slate-500 dark:text-slate-600 uppercase tracking-wide">
+        <p v-if="isHost" class="mt-3 text-[10px] font-black text-slate-950 dark:text-slate-600 uppercase tracking-wide">
           Rodada encerrada. Clique em <span class="text-rose-600 dark:text-rose-400">Resetar</span> no topo para recomeçar.
         </p>
       </div>
@@ -191,8 +191,8 @@
 
     <!-- Fixed card deck at bottom -->
     <div v-if="!gameState.revealed" class="fixed bottom-0 left-0 w-full z-20">
-      <div class="glass border-t border-white/5 px-4 pt-4 pb-5 backdrop-blur-xl">
-        <div class="max-w-5xl mx-auto flex gap-2.5 overflow-x-auto justify-start sm:justify-center custom-scrollbar">
+      <div class="glass border-t border-slate-200 dark:border-white/5 px-4 pt-8 pb-5 backdrop-blur-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+        <div class="max-w-5xl mx-auto flex gap-2.5 overflow-x-auto overflow-y-visible justify-start sm:justify-center custom-scrollbar py-2">
           <button
             v-for="card in deck"
             :key="card"
@@ -209,11 +209,11 @@
     </div>
 
     <!-- Footer (Relativo agora para não cortar as cartas) -->
-    <footer class="mt-12 mb-8 text-center">
-      <p class="text-[9px] text-slate-800 dark:text-slate-600 uppercase tracking-[0.2em] font-bold">
-        <a href="https://github.com/viniciusdocanto/planningpoker" target="_blank" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Portfólio GitHub</a>
-        <span class="mx-2 opacity-30">|</span>
-        <a href="https://docanto.net" target="_blank" class="hover:text-fuchsia-600 dark:hover:text-fuchsia-400 transition-colors font-black tracking-normal">docanto.net</a>
+    <footer class="mt-12 mb-8 text-center px-4">
+      <p class="text-[9px] text-slate-950 dark:text-slate-600 uppercase tracking-[0.2em] font-black">
+        <a href="https://github.com/viniciusdocanto/planningpoker" target="_blank" class="hover:text-indigo-800 dark:hover:text-indigo-400 transition-colors underline decoration-indigo-500/20 underline-offset-4">Portfólio GitHub</a>
+        <span class="mx-2 opacity-50">|</span>
+        <a href="https://docanto.net" target="_blank" class="hover:text-fuchsia-800 dark:hover:text-fuchsia-400 transition-colors font-black tracking-normal">docanto.net</a>
       </p>
     </footer>
 

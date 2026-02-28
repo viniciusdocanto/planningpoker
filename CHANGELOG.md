@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.6.3] - 2026-02-28
+
+### Corrigido
+- **Acessibilidade:** Implementado contraste absoluto (`Slate 950`) em todos os textos do Modo Claro.
+- **Interface:** Corrigido problema de "clipping" (corte) nas cartas do deck inferior durante a animação de seleção.
+- **Botões:** Melhorado estado de hover dos botões no modo claro para garantir legibilidade máxima.
+- **Estilo:** Engrossamento de fontes críticas para visualização em telas de alta claridade.
+
+---
+
 ## [0.6.2] - 2026-02-28
 
 ### Corrigido

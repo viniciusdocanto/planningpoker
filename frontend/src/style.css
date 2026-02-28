@@ -4,7 +4,8 @@
 
 :root {
     --bg-color: #f8fafc;
-    --text-color: #1e293b;
+    --text-color: #020617;
+    /* Slate 950 */
     --glass-bg: rgba(255, 255, 255, 0.7);
     --glass-border: rgba(0, 0, 0, 0.08);
     --glass-hover-bg: rgba(255, 255, 255, 0.85);
@@ -149,13 +150,27 @@ body::after {
 
 /* Animations */
 @keyframes pulse-soft {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
 }
 
 @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-6px); }
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-6px);
+    }
 }
 
 .animate-float {
