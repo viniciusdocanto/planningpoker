@@ -90,6 +90,7 @@
 </template>
 
 <script setup>
+// Planning Poker - HomeView - MIT License - (c) 2026 Vinicius do Canto
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 

@@ -1,3 +1,4 @@
+# Planning Poker Backend - MIT License - (c) 2026 Vinicius do Canto
 import re
 import os
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, status

@@ -207,6 +207,7 @@
 </template>
 
 <script setup>
+// Planning Poker - RoomView - MIT License - (c) 2026 Vinicius do Canto
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 

@@ -127,4 +127,6 @@ O repositório inclui um workflow em `.github/workflows/deploy-frontend.yml` que
 
 ## Licença
 
-MIT © [Vinicius](https://github.com/viniciusdocanto)
+Este projeto está sob a licença [MIT](LICENSE).
+
+MIT © [Vinicius do Canto](https://github.com/viniciusdocanto)

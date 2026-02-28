@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.2] - 2026-02-28
+
+### Adicionado
+- **Licença:** Adicionado arquivo `LICENSE` (MIT) e cabeçalhos de licença nos arquivos principais.
+- **Autor:** Atualizado nome e e-mail do autor para consistência em todo o projeto.
+
+---
+
 ## [0.5.1] - 2026-02-28
 
 ### Corrigido
