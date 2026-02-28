@@ -101,7 +101,7 @@ const isJoiningViaLink = ref(false)
 const errorMsg = ref('')
 
 // Mirrors the server-side validation rules
-const VALID_NAME_RE = /^[\w\s\-.]{1,30}$/u
+const VALID_NAME_RE = /^[a-zA-ZÀ-ÿ0-9\s\-.]{1,30}$/u
 const VALID_ROOM_RE = /^[A-Za-z0-9\-_]{1,40}$/
 
 const isNameValid = computed(() =>
@@ -133,7 +133,7 @@ const handleAction = () => {
   if (!name) return
 
   if (!VALID_NAME_RE.test(name)) {
-    errorMsg.value = 'Nome inválido. Use apenas letras, números, espaços, hífens ou pontos (máx. 30 chars).'
+    errorMsg.value = 'Nome inválido. Use apenas letras (incluindo acentos), números, espaços, hífens ou pontos (máx. 30 chars).'
     return
   }
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1] - 2026-02-28
+
+### Corrigido
+- **Segurança:** Atualizada a validação de nome de usuário para aceitar caracteres acentuados (ex: "João", "André").
+
+---
+
 ## [0.5.0] - 2026-02-28
 
 ### Adicionado

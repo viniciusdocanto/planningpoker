@@ -24,7 +24,7 @@ MAX_ROOM_ID_LEN   = 40
 MAX_USERNAME_LEN  = 30
 MAX_VOTE_LEN      = 4      # longest valid card is "☕" (4 bytes)
 MAX_USERS_PER_ROOM = 20
-VALID_NAME_RE     = re.compile(r'^[\w\s\-\.]{1,30}$', re.UNICODE)
+VALID_NAME_RE     = re.compile(r'^[a-zA-ZÀ-ÿ0-9\s\-\.]{1,30}$', re.UNICODE)
 VALID_ROOM_RE     = re.compile(r'^[A-Za-z0-9\-_]{1,40}$')
 ALLOWED_VOTES     = {'0', '½', '1', '2', '3', '5', '8', '13', '21', '34', '55', '89', '?', '☕'}
 
