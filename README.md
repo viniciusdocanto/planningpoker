@@ -110,6 +110,21 @@ npm run build
 
 > ⚠️ O plano gratuito do Render hiberna o servidor após 15 min de inatividade. A primeira conexão pode demorar ~30s para acordar.
 
+## CI/CD — Deploy automático
+
+O repositório inclui um workflow em `.github/workflows/deploy-frontend.yml` que faz build e deploy automático do frontend para a Hostinger sempre que um push é feito na branch `main` com alterações na pasta `frontend/`.
+
+### Segredos necessários (GitHub → Settings → Secrets → Actions)
+
+| Secret | Descrição |
+|---|---|
+| `FTP_SERVER` | Endereço FTP da Hostinger (ex: `ftp.seusite.com.br`) |
+| `FTP_USERNAME` | Usuário FTP |
+| `FTP_PASSWORD` | Senha FTP |
+| `VITE_WS_URL` | URL do backend no Render (ex: `wss://planning-poker-api.onrender.com`) |
+
+> Os segredos são usados no build e no upload — nunca ficam expostos no código.
+
 ## Licença
 
 MIT © [Vinicius](https://github.com/viniciusdocanto)
