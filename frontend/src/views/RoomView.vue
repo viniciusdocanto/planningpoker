@@ -263,7 +263,8 @@ onUnmounted(() => { if (reconnectTimer) clearTimeout(reconnectTimer); if (ws) { 
 
 const copyInviteLink = async () => {
   try {
-    await navigator.clipboard.writeText(`${window.location.origin}/?room=${roomId}`)
+    const base = window.location.origin + import.meta.env.BASE_URL
+    await navigator.clipboard.writeText(`${base}?room=${roomId}`)
     copied.value = true
     setTimeout(() => { copied.value = false }, 2000)
   } catch (e) { console.error(e) }
