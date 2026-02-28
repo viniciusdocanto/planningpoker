@@ -2,6 +2,12 @@
 
 @import 'tailwindcss';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --color-noir: #000000;
+}
+
 :root {
     --bg-color: #f8fafc;
     --text-color: #000000;

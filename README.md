@@ -2,7 +2,7 @@
 
 > Estime tarefas com seu time em tempo real, sem recarregar a página.
 
-[![version](https://img.shields.io/badge/version-0.6.6-indigo.svg)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-0.6.9-indigo.svg)](CHANGELOG.md)
 [![license](https://img.shields.io/badge/license-MIT-purple.svg)](LICENSE)
 
 ## Tecnologias

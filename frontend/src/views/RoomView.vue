@@ -41,26 +41,21 @@
       </div>
 
       <!-- Right: Actions -->
-      <div class="flex items-center gap-2 shrink-0">
-        <ThemeToggle class="scale-90" />
-        <div class="w-[1px] h-6 bg-slate-200 dark:bg-white/10 mx-1 hidden sm:block"></div>
+      <div class="flex items-center gap-3 shrink-0">
+        <ThemeToggle />
         <button
-          v-if="isHost && !gameState.revealed"
-          @click="revealVotes"
-          class="bg-gradient-to-r from-indigo-500 to-purple-500 hover:opacity-90 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-lg shadow-indigo-500/20"
+          v-if="isHost"
+          @click="handleAction"
+          class="px-5 py-2 rounded-xl text-white font-black text-sm shadow-lg transition-all duration-200 active:scale-95"
+          :class="gameState.revealed
+            ? 'bg-gradient-to-r from-rose-500 to-rose-600 shadow-rose-500/20 hover:opacity-90'
+            : 'bg-gradient-to-r from-indigo-500 to-purple-600 shadow-indigo-500/20 hover:opacity-90'"
         >
-          Revelar
-        </button>
-        <button
-          v-if="isHost && gameState.revealed"
-          @click="resetVotes"
-          class="bg-gradient-to-r from-rose-500 to-pink-500 hover:opacity-90 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-lg shadow-rose-500/20"
-        >
-          Resetar
+          {{ gameState.revealed ? 'Resetar' : 'Revelar' }}
         </button>
         <button
           @click="leaveRoom"
-          class="bg-slate-100 dark:bg-white/5 hover:bg-slate-900 dark:hover:bg-white/10 text-slate-800 dark:text-slate-400 hover:text-white dark:hover:text-white text-xs font-black px-3 py-2 rounded-xl transition-all border border-slate-300 dark:border-white/5"
+          class="px-4 py-2 rounded-xl text-black dark:text-white font-black text-sm bg-slate-950/5 dark:bg-white/10 hover:bg-slate-900/10 dark:hover:bg-white/20 transition-all active:scale-95"
         >
           Sair
         </button>
@@ -95,13 +90,13 @@
                   ? 'bg-gradient-to-b from-indigo-500 to-purple-600 -translate-y-2 shadow-[0_8px_32px_rgba(99,102,241,0.5)]'
                   : '',
                 !data.voted && !gameState.revealed
-                  ? 'border-2 border-dashed border-white/10 opacity-40 bg-white/5'
+                  ? 'border-2 border-dashed border-slate-300/50 dark:border-white/10 opacity-40 bg-slate-200/30 dark:bg-white/5'
                   : '',
                 gameState.revealed && data.voted
-                  ? 'bg-white shadow-[0_8px_40px_rgba(255,255,255,0.2)]'
+                  ? 'bg-white shadow-[0_8px_40px_rgba(255,255,255,0.2)] border border-slate-200 dark:border-transparent'
                   : '',
                 gameState.revealed && !data.voted
-                  ? 'bg-white/5 border border-white/10'
+                  ? 'bg-slate-200/30 dark:bg-white/5 border border-slate-300/50 dark:border-white/10'
                   : '',
               ]"
             >
@@ -147,10 +142,10 @@
           </template>
           <template v-else>
             <div class="text-center">
-              <p class="text-emerald-100 text-sm font-black">
+              <p class="text-white dark:text-emerald-100 text-sm font-black drop-shadow-sm">
                 {{ Object.values(gameState.users).filter(u => u.voted).length }}/{{ Object.keys(gameState.users).length }}
               </p>
-              <p class="text-emerald-400/80 text-[10px] font-bold uppercase tracking-widest mt-0.5">votaram</p>
+              <p class="text-emerald-300 dark:text-emerald-400/80 text-[10px] font-bold uppercase tracking-widest mt-0.5">votaram</p>
             </div>
           </template>
         </div>
@@ -208,7 +203,7 @@
             </button>
           </div>
 
-          <!-- Footer unified with HomeView -->
+          <!-- Footer unified with HomeView (v0.6.7) -->
           <footer class="pb-1 text-center">
             <div class="text-[9px] text-black dark:text-slate-600 uppercase tracking-widest font-black flex flex-col items-center gap-1.5">
               <div class="flex items-center">
@@ -216,7 +211,7 @@
                 <span class="mx-2 opacity-50">|</span>
                 <a href="https://docanto.net" target="_blank" class="hover:text-fuchsia-800 dark:hover:text-fuchsia-400 transition-colors font-black underline decoration-fuchsia-500/30 underline-offset-4">Vinicius do Canto</a>
               </div>
-              <span class="opacity-30 tracking-normal normal-case font-mono text-[8px]">v0.6.5</span>
+              <span class="opacity-30 tracking-normal normal-case font-mono text-[8px]">v0.6.9</span>
             </div>
           </footer>
         </div>
@@ -232,7 +227,7 @@
           <span class="mx-2 opacity-50">|</span>
           <a href="https://docanto.net" target="_blank" class="hover:text-fuchsia-800 dark:hover:text-fuchsia-400 transition-colors font-black underline decoration-fuchsia-500/30 underline-offset-4">Vinicius do Canto</a>
         </div>
-        <span class="opacity-30 tracking-normal normal-case font-mono text-[8px]">v0.6.5</span>
+        <span class="opacity-30 tracking-normal normal-case font-mono text-[8px]">v0.6.9</span>
       </div>
     </footer>
 

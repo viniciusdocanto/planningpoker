@@ -67,17 +67,18 @@
           >
         </div>
 
-        <!-- Action Button -->
+        <!-- Action Button (v0.6.7 fix: text-white for visibility) -->
         <button
           @click="handleAction"
           :disabled="!isNameValid"
-          class="w-full relative overflow-hidden font-semibold py-4 rounded-xl transition-all duration-200 text-sm mt-2
+          class="w-full relative overflow-hidden font-black py-4 rounded-xl transition-all duration-200 text-sm mt-2
             bg-gradient-to-r from-indigo-500 via-purple-500 to-fuchsia-500
-            hover:opacity-90 hover:shadow-lg hover:shadow-purple-500/25
+            text-white shadow-lg shadow-purple-500/25
+            hover:opacity-90 hover:scale-[1.01]
             disabled:opacity-40 disabled:cursor-not-allowed
             active:scale-[0.98]"
         >
-          <span class="relative z-10">
+          <span class="relative z-10 flex items-center justify-center gap-2">
             {{ isJoiningViaLink || roomId.trim() ? '🚀 Entrar na sala' : '✨ Criar nova sala' }}
           </span>
         </button>
@@ -87,14 +88,14 @@
       </div>
     </div>
 
-    <!-- Footer -->
+    <!-- Footer (v0.6.7 version) -->
     <div class="mt-8 text-[10px] text-black dark:text-slate-600 uppercase tracking-widest font-black flex flex-col items-center gap-1.5">
       <div class="flex items-center">
         <a href="https://github.com/viniciusdocanto/planningpoker" target="_blank" class="hover:text-indigo-800 dark:hover:text-indigo-400 transition-colors">Open Source</a>
         <span class="mx-2 opacity-50">|</span>
         <a href="https://docanto.net" target="_blank" class="hover:text-fuchsia-800 dark:hover:text-fuchsia-400 transition-colors font-black underline decoration-fuchsia-500/30 underline-offset-4">Vinicius do Canto</a>
       </div>
-      <span class="opacity-30 tracking-normal normal-case font-mono text-[8px]">v0.6.5</span>
+      <span class="opacity-30 tracking-normal normal-case font-mono text-[8px]">v0.6.9</span>
     </div>
   </div>
 </template>

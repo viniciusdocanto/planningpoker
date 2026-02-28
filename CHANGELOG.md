@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.6.9] - 2026-02-28
+### Fixed
+- **UI da Sala (Room UI):** Corrigida a visibilidade dos espaços de cartas (placeholders) no modo claro, utilizando bordas e fundo contrastantes.
+- **Mesa de Poker:** Melhorado o contraste do texto central ("X/Y votaram") no modo claro para maior nitidez.
+- **Cards Revelados:** Adicionada borda sutil em cartas reveladas no modo claro para evitar que se misturem com o fundo.
+
+## [0.6.8] - 2026-02-28
+### Fixed
+- **Especificidade de Tema (Selector Strategy):** Corrigido bug onde o modo escuro do sistema (OS) sobrescrevia o modo claro manual. Agora o Tailwind 4 usa a estratégia de seletor (`.dark`), garantindo que a escolha do usuário no app tenha precedência absoluta.
+
+## [0.6.7] - 2026-02-28
+### Fixed
+- **Contraste de Botões:** Forçado texto branco (`text-white`) em todos os botões com gradiente (Criar, Revelar, Resetar), garantindo legibilidade premium em ambos os temas.
+- **Modo Claro (Light Mode):** Refinado o contraste de inputs, botões secundários e rodapé para garantir legibilidade absoluta sem comprometer a estética.
+- **Compatibilidade:** Verificado que as mudanças não impactam negativamente o Modo Escuro.
+
 ## [0.6.6] - 2026-02-28
 ### Fixed
 - **Caminho de Instalação (Base Path):** Configurado como dinâmico (`/` em dev, `./` em prod). Agora o app funciona na raiz do localhost e automaticamente em qualquer subpasta no servidor de produção.
