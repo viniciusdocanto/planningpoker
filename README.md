@@ -88,9 +88,8 @@ planpoker/
 1. Acesse [render.com](https://render.com) e crie uma conta
 2. Clique em **New → Web Service** e conecte ao repositório do GitHub
 3. Configure:
-   - **Root Directory:** `backend`
-   - **Build Command:** `pip install -r requirements.txt`
-   - **Start Command:** `uvicorn main:app --host 0.0.0.0 --port $PORT`
+   - **Build Command:** `pip install -r backend/requirements.txt`
+   - **Start Command:** `uvicorn backend.main:app --host 0.0.0.0 --port $PORT`
 4. Em **Environment Variables**, adicione:
    - `ALLOWED_ORIGINS` → `https://seusite.com.br,https://www.seusite.com.br`
 5. Clique em **Deploy** e anote a URL gerada (ex: `https://planning-poker-api.onrender.com`)
