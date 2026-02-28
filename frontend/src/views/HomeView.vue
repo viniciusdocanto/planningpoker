@@ -1,0 +1,151 @@
+<template>
+  <div class="min-h-screen flex flex-col items-center justify-center p-4 relative">
+
+    <!-- Logo + Tagline -->
+    <div class="text-center mb-10 animate-float">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-5 bg-gradient-to-br from-indigo-500 via-purple-500 to-fuchsia-500 shadow-lg glow-purple">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3H5a2 2 0 00-2 2v14a2 2 0 002 2h4m6-16h4a2 2 0 012 2v14a2 2 0 01-2 2h-4m-6 0V3" />
+        </svg>
+      </div>
+      <h1 class="text-5xl font-extrabold tracking-tight text-gradient mb-3">Planning Poker</h1>
+      <p class="text-slate-400 text-lg max-w-sm">
+        Estime tarefas com seu time em tempo real, de forma simples e divertida.
+      </p>
+    </div>
+
+    <!-- Card -->
+    <div class="glass rounded-3xl p-8 w-full max-w-md card-shadow">
+
+      <!-- Join via link - special state -->
+      <template v-if="isJoiningViaLink">
+        <div class="flex items-center gap-3 mb-6 p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/20">
+          <div class="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </div>
+          <div class="min-w-0">
+            <p class="text-xs text-indigo-400 font-semibold uppercase tracking-wider mb-0.5">Entrando na sala</p>
+            <p class="text-white font-mono text-sm truncate" :title="roomId">{{ roomId }}</p>
+          </div>
+        </div>
+      </template>
+
+      <template v-else>
+        <h2 class="text-xl font-bold text-white mb-6">Entrar ou criar sala</h2>
+      </template>
+
+      <div class="space-y-4">
+        <!-- Name Input -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Seu nome</label>
+          <input
+            v-model="userName"
+            type="text"
+            placeholder="Como devemos te chamar?"
+            autofocus
+            @keyup.enter="handleAction"
+            class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500/40 transition-all text-sm"
+          >
+        </div>
+
+        <!-- Room ID Input (only if NOT joining via link) -->
+        <div v-if="!isJoiningViaLink">
+          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">ID da sala <span class="normal-case font-normal text-slate-500">(opcional)</span></label>
+          <input
+            v-model="roomId"
+            type="text"
+            placeholder="Deixe em branco para criar uma nova"
+            @keyup.enter="handleAction"
+            class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500/40 transition-all text-sm"
+          >
+        </div>
+
+        <!-- Action Button -->
+        <button
+          @click="handleAction"
+          :disabled="!isNameValid"
+          class="w-full relative overflow-hidden font-semibold py-4 rounded-xl transition-all duration-200 text-sm mt-2
+            bg-gradient-to-r from-indigo-500 via-purple-500 to-fuchsia-500
+            hover:opacity-90 hover:shadow-lg hover:shadow-purple-500/25
+            disabled:opacity-40 disabled:cursor-not-allowed
+            active:scale-[0.98]"
+        >
+          <span class="relative z-10">
+            {{ isJoiningViaLink || roomId.trim() ? '🚀 Entrar na sala' : '✨ Criar nova sala' }}
+          </span>
+        </button>
+
+        <!-- Error message -->
+        <p v-if="errorMsg" class="text-rose-400 text-xs text-center mt-1">⚠️ {{ errorMsg }}</p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <p class="mt-8 text-xs text-slate-600">
+      open source · planning poker em tempo real
+    </p>
+  </div>
+</template>
+
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+
+const router = useRouter()
+const route = useRoute()
+const userName = ref('')
+const roomId = ref('')
+const isJoiningViaLink = ref(false)
+const errorMsg = ref('')
+
+// Mirrors the server-side validation rules
+const VALID_NAME_RE = /^[\w\s\-.]{1,30}$/u
+const VALID_ROOM_RE = /^[A-Za-z0-9\-_]{1,40}$/
+
+const isNameValid = computed(() =>
+  userName.value.trim().length > 0 && VALID_NAME_RE.test(userName.value.trim())
+)
+
+onMounted(() => {
+  if (route.query.room) {
+    const roomParam = String(route.query.room)
+    if (VALID_ROOM_RE.test(roomParam)) {
+      roomId.value = roomParam
+      isJoiningViaLink.value = true
+    }
+  }
+})
+
+const generateRandomId = (length = 20) => {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  let result = ''
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length))
+  }
+  return result
+}
+
+const handleAction = () => {
+  errorMsg.value = ''
+  const name = userName.value.trim()
+  if (!name) return
+
+  if (!VALID_NAME_RE.test(name)) {
+    errorMsg.value = 'Nome inválido. Use apenas letras, números, espaços, hífens ou pontos (máx. 30 chars).'
+    return
+  }
+
+  const customRoom = roomId.value.trim()
+  if (customRoom && !VALID_ROOM_RE.test(customRoom)) {
+    errorMsg.value = 'ID de sala inválido. Use apenas letras, números, hífens ou underscores (máx. 40 chars).'
+    return
+  }
+
+  const targetRoom = customRoom || generateRandomId(20)
+  sessionStorage.setItem('playerName', name)
+  router.push(`/room/${targetRoom}`)
+}
+</script>
+
