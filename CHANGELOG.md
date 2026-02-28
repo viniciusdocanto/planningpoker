@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.6.1] - 2026-02-28
+
+### Corrigido
+- **Interface:** Melhorado o contraste de textos e rodapés no modo claro para melhor legibilidade.
+- **Bugs:** Corrigido erro no botão "Compartilhar" que ignorava o ID da sala.
+- **Bugs:** Corrigida reconexão automática do WebSocket que falhava após a última atualização.
+
+---
+
 ## [0.6.0] - 2026-02-28
 
 ### Adicionado

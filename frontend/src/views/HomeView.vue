@@ -14,13 +14,13 @@
         </svg>
       </div>
       <h1 class="text-5xl font-extrabold tracking-tight text-gradient mb-3">Planning Poker</h1>
-      <p class="text-slate-500 dark:text-slate-400 text-lg max-w-sm">
+      <p class="text-slate-600 dark:text-slate-400 text-lg max-w-sm">
         Estime tarefas com seu time em tempo real, de forma simples e divertida.
       </p>
     </div>
 
     <!-- Card -->
-    <div class="glass rounded-3xl p-8 w-full max-w-md card-shadow border-white/10 dark:border-white/5">
+    <div class="glass rounded-3xl p-8 w-full max-w-md card-shadow border-slate-900/5 dark:border-white/5">
 
       <!-- Join via link - special state -->
       <template v-if="isJoiningViaLink">
@@ -88,11 +88,11 @@
     </div>
 
     <!-- Footer -->
-    <p class="mt-8 text-[10px] text-slate-600 uppercase tracking-widest font-medium">
+    <div class="mt-8 text-[10px] text-slate-500 dark:text-slate-600 uppercase tracking-widest font-bold">
       <a href="https://github.com/viniciusdocanto/planningpoker" target="_blank" class="hover:text-indigo-400 transition-colors">Open Source</a>
       <span class="mx-2 opacity-20">|</span>
       por <a href="https://docanto.net" target="_blank" class="hover:text-fuchsia-400 transition-colors font-bold">Vinicius do Canto</a>
-    </p>
+    </div>
   </div>
 </template>
 

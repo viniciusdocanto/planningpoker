@@ -18,23 +18,23 @@
           <span class="text-slate-600 dark:text-slate-300 font-mono text-xs truncate max-w-[140px] sm:max-w-xs" :title="roomId">{{ roomId }}</span>
           <button
             @click="copyInviteLink"
-            class="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition-all border border-slate-200 dark:border-white/5"
+            class="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all border border-slate-200 dark:border-white/5"
           >
             <svg v-if="!copied" xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
             </svg>
-            <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-green-500 dark:text-green-400" viewBox="0 0 20 20" fill="currentColor">
+            <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-green-600 dark:text-green-400" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
             </svg>
             {{ copied ? 'Copiado!' : 'Compartilhar' }}
           </button>
         </div>
-        <div class="flex items-center gap-2 text-[10px] text-slate-500 uppercase tracking-wider font-medium">
+        <div class="flex items-center gap-2 text-[10px] text-slate-600 dark:text-slate-500 uppercase tracking-wider font-bold">
           <span>{{ userName }}</span>
-          <span v-if="isHost" class="text-amber-600 dark:text-yellow-400 font-bold">👑 Host</span>
+          <span v-if="isHost" class="text-amber-700 dark:text-yellow-400 font-bold">👑 Host</span>
           <!-- WS status dot -->
-          <span class="flex items-center gap-1" :class="wsStatus === 'connected' ? 'text-green-600 dark:text-green-500' : 'text-amber-600 dark:text-yellow-500 animate-pulse-soft'">
-            · <span class="w-1.5 h-1.5 rounded-full inline-block" :class="wsStatus === 'connected' ? 'bg-green-600 dark:bg-green-500' : 'bg-amber-600 dark:bg-yellow-500'"></span>
+          <span class="flex items-center gap-1" :class="wsStatus === 'connected' ? 'text-green-600 dark:text-green-500' : 'text-amber-700 dark:text-yellow-500 animate-pulse-soft'">
+            · <span class="w-1.5 h-1.5 rounded-full inline-block" :class="wsStatus === 'connected' ? 'bg-green-600 dark:bg-green-500' : 'bg-amber-700 dark:bg-yellow-500'"></span>
             {{ wsStatus === 'connected' ? 'OK' : '...' }}
           </span>
         </div>
@@ -200,7 +200,7 @@
             class="flex-shrink-0 w-[52px] h-[72px] rounded-xl font-bold text-lg border-2 transition-all duration-200 card-hover select-none"
             :class="myVote === card
               ? 'bg-gradient-to-b from-indigo-500 to-indigo-700 border-indigo-500 text-white card-selected shadow-lg shadow-indigo-500/40'
-              : 'bg-white dark:bg-white text-gray-800 border-gray-200 dark:border-white/10 hover:border-indigo-400/60'"
+              : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 border-slate-200 dark:border-white/10 hover:border-indigo-400/60 transition-colors'"
           >
             {{ card }}
           </button>
@@ -260,8 +260,8 @@ const voteAverage = computed(() => {
 const WS_BASE = import.meta.env.VITE_WS_URL || 'ws://localhost:8000'
 
 const connect = () => {
-  if (!userName) { router.push('/'); return }
-  ws = new WebSocket(`${WS_BASE}/ws/${roomId}/${encodeURIComponent(userName)}`)
+  if (!userName.value) { router.push('/'); return }
+  ws = new WebSocket(`${WS_BASE}/ws/${roomId.value}/${encodeURIComponent(userName.value)}`)
   ws.onopen = () => { wsStatus.value = 'connected'; if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null } }
   ws.onmessage = (e) => {
     try {
@@ -284,7 +284,7 @@ onUnmounted(() => { if (reconnectTimer) clearTimeout(reconnectTimer); if (ws) { 
 const copyInviteLink = async () => {
   try {
     const base = window.location.origin + import.meta.env.BASE_URL
-    await navigator.clipboard.writeText(`${base}?room=${roomId}`)
+    await navigator.clipboard.writeText(`${base}?room=${roomId.value}`)
     copied.value = true
     setTimeout(() => { copied.value = false }, 2000)
   } catch (e) { console.error(e) }
