@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.6.0] - 2026-02-28
+
+### Adicionado
+- **Interface:** Sistema de Tema Claro/Escuro com detecção automática do sistema e alternância manual via botão.
+- **Persistência:** O navegador agora lembra o último nome usado e a preferência de tema (`localStorage`).
+- **Design:** Ajustes de contraste e cores para garantir acessibilidade e beleza tanto no tema claro quanto no escuro.
+
+---
+
 ## [0.5.3] - 2026-02-28
 
 ### Adicionado
