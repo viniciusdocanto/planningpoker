@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.9.0] - 2026-02-28
+### Added
+- **Rate Limiting:** Implementado limitador de taxa no backend (máx 10 msgs/seg por conexão) para prevenir spam e abusos.
+
+## [0.8.1] - 2026-02-28
+### Added
+- **Plano de Ação de Segurança:** Documentado em `security_action_plan.md`, detalhando medidas concretas para implementar senhas em salas, rate limiting e endurecimento de CORS.
+
+## [0.8.0] - 2026-02-28
+### Added
+- **Auditoria de Segurança:** Documentada em `security_audit.md`, avaliando riscos de autenticação, rate limiting e validações de backend.
+- **Estudo de Melhorias:** Documentado em `improvement_study.md`, com roadmap para persistência com Redis, baralhos customizáveis e migração para TypeScript.
+
 ## [0.7.1] - 2026-02-28
 ### Fixed
 - **Botão Revelar/Resetar:** Restaurada a funcionalidade do botão de ação do host através da implementação da função `handleAction` em `RoomView.vue`.

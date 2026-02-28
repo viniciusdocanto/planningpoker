@@ -1,6 +1,7 @@
 # Planning Poker Backend - MIT License - (c) 2026 Vinicius do Canto
 import re
 import os
+import time
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, status
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Dict
@@ -28,6 +29,8 @@ MAX_USERS_PER_ROOM = 20
 VALID_NAME_RE     = re.compile(r'^[a-zA-ZÀ-ÿ0-9\s\-\.]{1,30}$', re.UNICODE)
 VALID_ROOM_RE     = re.compile(r'^[A-Za-z0-9\-_]{1,40}$')
 ALLOWED_VOTES     = {'0', '½', '1', '2', '3', '5', '8', '13', '21', '34', '55', '89', '?', '☕'}
+RATE_LIMIT_MSGS   = 10      # max messages per window
+RATE_LIMIT_WINDOW = 1.0     # window size in seconds
 
 
 def validate_room_id(room_id: str) -> bool:
@@ -42,6 +45,7 @@ class ConnectionManager:
     def __init__(self):
         self.active_connections: Dict[str, List[WebSocket]] = {}
         self.room_states: Dict[str, Dict[str, any]] = {}
+        self.rate_limits: Dict[WebSocket, Dict[str, any]] = {}
 
     async def connect(self, websocket: WebSocket, room_id: str, user_name: str) -> bool:
         """
@@ -94,6 +98,10 @@ class ConnectionManager:
                 del self.active_connections[room_id]
                 if room_id in self.room_states:
                     del self.room_states[room_id]
+        
+        # Clean up rate limit data
+        if websocket in self.rate_limits:
+            del self.rate_limits[websocket]
 
     async def broadcast_state(self, room_id: str):
         if room_id not in self.active_connections:
@@ -143,6 +151,22 @@ class ConnectionManager:
                 self.room_states[room_id]['users'][user]['voted'] = False
             await self.broadcast_state(room_id)
 
+    def is_rate_limited(self, websocket: WebSocket) -> bool:
+        now = time.time()
+        if websocket not in self.rate_limits:
+            self.rate_limits[websocket] = {'count': 1, 'start_time': now}
+            return False
+        
+        data = self.rate_limits[websocket]
+        if now - data['start_time'] < RATE_LIMIT_WINDOW:
+            if data['count'] >= RATE_LIMIT_MSGS:
+                return True
+            data['count'] += 1
+        else:
+            data['count'] = 1
+            data['start_time'] = now
+        return False
+
 
 manager = ConnectionManager()
 
@@ -157,6 +181,9 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str, user_name: str)
         while True:
             try:
                 data = await websocket.receive_json()
+                if manager.is_rate_limited(websocket):
+                    # Silently ignore rate-limited messages to save resources
+                    continue
             except Exception:
                 # Invalid JSON or connection error — close gracefully
                 break
