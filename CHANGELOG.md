@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.6] - 2026-02-28
+### Fixed
+- **Caminho de Instalação (Base Path):** Configurado como dinâmico (`/` em dev, `./` em prod). Agora o app funciona na raiz do localhost e automaticamente em qualquer subpasta no servidor de produção.
+
 ## [0.6.5] - 2026-02-28
 ### Fixed
 - **Dono da Sala (Host):** Corrigido bug crítico na verificação de permissão que impedia o host de ver os botões de Revelar/Resetar.

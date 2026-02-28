@@ -3,10 +3,10 @@ import vue from '@vitejs/plugin-vue'
 import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
-export default defineConfig({
-  base: '/planningpoker/',
+export default defineConfig(({ command }) => ({
+  base: command === 'serve' ? '/' : './',
   plugins: [
     vue(),
     tailwindcss(),
   ],
-})
+}))
