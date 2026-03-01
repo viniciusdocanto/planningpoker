@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { onBeforeMount } from 'vue'
 import { RouterView } from 'vue-router'
 

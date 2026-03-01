@@ -100,7 +100,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 // Planning Poker - HomeView - MIT License - (c) 2026 Vinicius do Canto
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
@@ -108,10 +108,10 @@ import ThemeToggle from '../components/ThemeToggle.vue'
 
 const router = useRouter()
 const route = useRoute()
-const userName = ref('')
-const roomId = ref('')
-const isJoiningViaLink = ref(false)
-const errorMsg = ref('')
+const userName = ref<string>('')
+const roomId = ref<string>('')
+const isJoiningViaLink = ref<boolean>(false)
+const errorMsg = ref<string>('')
 
 // Mirrors the server-side validation rules
 const VALID_NAME_RE = /^[a-zA-ZÀ-ÿ0-9\s\-.]{1,30}$/u
@@ -135,7 +135,7 @@ onMounted(() => {
   }
 })
 
-const generateRandomId = (length = 20) => {
+const generateRandomId = (length: number = 20): string => {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
   let result = ''
   for (let i = 0; i < length; i++) {
@@ -168,6 +168,6 @@ const handleAction = () => {
   
   router.push(`/room/${targetRoom}`)
 }
-const appVersion = __APP_VERSION__
+const appVersion: string = __APP_VERSION__
 </script>
 

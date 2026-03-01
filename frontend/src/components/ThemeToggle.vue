@@ -1,7 +1,7 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue'
 
-const isDark = ref(true)
+const isDark = ref<boolean>(true)
 
 const toggleTheme = () => {
   isDark.value = !isDark.value

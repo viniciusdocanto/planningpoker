@@ -234,49 +234,54 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 // Planning Poker - RoomView - MIT License - (c) 2026 Vinicius do Canto
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ThemeToggle from '../components/ThemeToggle.vue'
+import type { GameState, WsInMessage, WsStatus, CardValue } from '../types/poker'
+import { DECK } from '../types/poker'
 
 const route = useRoute()
 const router = useRouter()
-const roomId = ref(route.params.id)
-const userName = ref(sessionStorage.getItem('playerName') || localStorage.getItem('poker-player-name') || '')
+const roomId = ref<string>(String(route.params.id))
+const userName = ref<string>(
+  sessionStorage.getItem('playerName') ?? localStorage.getItem('poker-player-name') ?? ''
+)
 
 // Redirect if no name
 if (!userName.value) {
   router.push(`/?room=${roomId.value}`)
 }
-const appVersion = __APP_VERSION__
-const deck = ['0', '½', '1', '2', '3', '5', '8', '13', '21', '34', '55', '89', '?', '☕']
 
-const gameState = ref({ users: {}, revealed: false, host: null })
-const myVote = ref(null)
-const copied = ref(false)
-const wsStatus = ref('connecting')
+const appVersion: string = __APP_VERSION__
+const deck: readonly string[] = DECK
 
-let ws = null
-let reconnectTimer = null
+const gameState = ref<GameState>({ users: {}, revealed: false, host: null })
+const myVote = ref<CardValue | null>(null)
+const copied = ref<boolean>(false)
+const wsStatus = ref<WsStatus>('connecting')
 
-const isHost = computed(() => gameState.value.host === userName.value)
+let ws: WebSocket | null = null
+let reconnectTimer: ReturnType<typeof setTimeout> | null = null
 
-const voteAverage = computed(() => {
+const isHost = computed<boolean>(() => gameState.value.host === userName.value)
+
+const voteAverage = computed<number | string | null>(() => {
   if (!gameState.value.revealed) return null
   const nums = Object.values(gameState.value.users)
-    .filter(d => d.voted && !isNaN(parseFloat(d.vote)))
-    .map(d => parseFloat(d.vote))
+    .filter(d => d.voted && d.vote != null && !isNaN(parseFloat(d.vote)))
+    .map(d => parseFloat(d.vote!))
   if (!nums.length) return null
   const avg = nums.reduce((a, b) => a + b, 0) / nums.length
   return Number.isInteger(avg) ? avg : avg.toFixed(1)
 })
 
-const rawWsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:8000'
+const rawWsUrl: string = import.meta.env.VITE_WS_URL || 'ws://localhost:8000'
 // Ensure correct protocol (replace http/https with ws/wss)
-const WS_BASE = rawWsUrl.replace(/^http/, 'ws')
+const WS_BASE: string = rawWsUrl.replace(/^http/, 'ws')
 
-const connect = () => {
+const connect = (): void => {
   if (!userName.value) { router.push('/'); return }
   ws = new WebSocket(`${WS_BASE}/ws/${roomId.value}/${encodeURIComponent(userName.value)}`)
   ws.onopen = () => {
@@ -284,36 +289,39 @@ const connect = () => {
     wsStatus.value = 'connected'
     if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null }
   }
-  ws.onmessage = (e) => {
+  ws.onmessage = (e: MessageEvent<string>) => {
     try {
-      const msg = JSON.parse(e.data)
+      const msg = JSON.parse(e.data) as WsInMessage
       if (msg.type === 'state_update') {
         gameState.value = msg.data
-        if (gameState.value.users[userName.value] && !gameState.value.users[userName.value].voted) myVote.value = null
+        const me = gameState.value.users[userName.value]
+        if (me && !me.voted) myVote.value = null
       }
     } catch (err) {
       console.warn('Received invalid message from server:', err)
     }
   }
-  ws.onclose = (event) => {
+  ws.onclose = (event: CloseEvent) => {
     console.warn(`🔌 WebSocket: Conexão fechada (Código: ${event.code}). Tentando reconectar em 3s...`)
     wsStatus.value = 'reconnecting'
     reconnectTimer = setTimeout(connect, 3000)
   }
-  ws.onerror = (err) => {
+  ws.onerror = (err: Event) => {
     console.error('🔌 WebSocket: Erro detectado na conexão:', err)
-    ws.close()
+    ws?.close()
   }
 }
 
 onMounted(connect)
-onUnmounted(() => { if (reconnectTimer) clearTimeout(reconnectTimer); if (ws) { ws.onclose = null; ws.close() } })
+onUnmounted(() => {
+  if (reconnectTimer) clearTimeout(reconnectTimer)
+  if (ws) { ws.onclose = null; ws.close() }
+})
 
-const copyInviteLink = async () => {
+const copyInviteLink = async (): Promise<void> => {
   try {
     const origin = window.location.origin
     const base = import.meta.env.BASE_URL
-    // Construct URL ensuring no double slashes and correct path
     const fullBase = (origin + base).replace(/\/+$/, '')
     await navigator.clipboard.writeText(`${fullBase}/?room=${roomId.value}`)
     copied.value = true
@@ -321,18 +329,18 @@ const copyInviteLink = async () => {
   } catch (e) { console.error(e) }
 }
 
-const selectCard = (card) => {
-  myVote.value = card
+const selectCard = (card: string): void => {
+  myVote.value = card as CardValue
   if (ws?.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ action: 'vote', value: card }))
 }
-const handleAction = () => {
+const handleAction = (): void => {
   if (gameState.value.revealed) {
     resetVotes()
   } else {
     revealVotes()
   }
 }
-const revealVotes = () => { if (ws?.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ action: 'reveal' })) }
-const resetVotes = () => { if (ws?.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ action: 'reset' })) }
-const leaveRoom = () => { if (ws) { ws.onclose = null; ws.close() }; router.push('/') }
+const revealVotes = (): void => { if (ws?.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ action: 'reveal' })) }
+const resetVotes = (): void => { if (ws?.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ action: 'reset' })) }
+const leaveRoom = (): void => { if (ws) { ws.onclose = null; ws.close() }; router.push('/') }
 </script>

@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.12.0] - 2026-03-01
+### Added
+- **Migração TypeScript:** Frontend migrado de JavaScript puro para TypeScript com `strict: true`. Todos os componentes Vue 3 agora usam `<script setup lang="ts">`.
+- **Tipos Compartilhados:** Novo arquivo `src/types/poker.ts` com interfaces `GameState`, `UserData`, `WsInMessage`, `WsStatus` e `CardValue`.
+- **Pydantic Estrito (Backend):** Modelos `UserState`, `RoomState` e `WsMessage` substituem os dicts genéricos no `main.py`, com validação em tempo de execução.
+- **Verificação CI:** `vue-tsc --noEmit` adicionado como checagem no build (zero erros confirmados).
+
 ## [0.11.0] - 2026-03-01
 ### Added
 - **Persistência com Redis:** Estado das salas (usuários, votos, host) agora é armazenado no Redis com TTL de 2h, sobrevivendo a reinicializações do servidor.

@@ -5,7 +5,8 @@ import json
 import time
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, status
 from fastapi.middleware.cors import CORSMiddleware
-from typing import List, Dict, Optional
+from pydantic import BaseModel, field_validator
+from typing import Dict, List, Optional
 
 import asyncio
 import logging
@@ -28,12 +29,48 @@ ALLOWED_VOTES     = {'0', '½', '1', '2', '3', '5', '8', '13', '21', '34', '55',
 RATE_LIMIT_MSGS   = 10      # max messages per window
 RATE_LIMIT_WINDOW = 1.0     # window size in seconds
 
-app = FastAPI()
+# ---------------------------------------------------------------------------
+# Pydantic Models
+# ---------------------------------------------------------------------------
 
+APP_VERSION = "0.12.0"
+
+
+class UserState(BaseModel):
+    vote: Optional[str] = None
+    voted: bool = False
+
+
+class RoomState(BaseModel):
+    users: Dict[str, UserState] = {}
+    revealed: bool = False
+    host: Optional[str] = None
+    last_activity: float = 0.0
+
+    def model_dump_json_safe(self) -> dict:
+        """Returns a plain dict safe for JSON serialisation."""
+        return self.model_dump()
+
+
+class WsMessage(BaseModel):
+    action: str
+    value: Optional[str] = None
+
+    @field_validator('action')
+    @classmethod
+    def action_must_be_known(cls, v: str) -> str:
+        if v not in ('vote', 'reveal', 'reset'):
+            raise ValueError(f'Unknown action: {v}')
+        return v
+
+
+
+app = FastAPI()
 
 # ---------------------------------------------------------------------------
 # Redis Room Store
 # ---------------------------------------------------------------------------
+
 
 class RedisRoomStore:
     """
@@ -63,21 +100,22 @@ class RedisRoomStore:
             logger.error(f"❌ Failed to connect to Redis: {e}. Falling back to in-memory store.")
             self._redis = None
 
-    async def get(self, room_id: str) -> Optional[dict]:
+    async def get(self, room_id: str) -> Optional[RoomState]:
         if self._use_redis and self._redis:
             raw = await self._redis.get(f"room:{room_id}")
-            return json.loads(raw) if raw else None
-        return self._memory.get(room_id)
+            return RoomState.model_validate_json(raw) if raw else None
+        raw_dict = self._memory.get(room_id)
+        return RoomState.model_validate(raw_dict) if raw_dict else None
 
-    async def set(self, room_id: str, state: dict):
+    async def set(self, room_id: str, state: RoomState) -> None:
         if self._use_redis and self._redis:
             await self._redis.set(
                 f"room:{room_id}",
-                json.dumps(state),
+                state.model_dump_json(),
                 ex=REDIS_TTL
             )
         else:
-            self._memory[room_id] = state
+            self._memory[room_id] = state.model_dump()
 
     async def delete(self, room_id: str):
         if self._use_redis and self._redis:
@@ -193,7 +231,7 @@ class ConnectionManager:
     def __init__(self):
         # WebSocket objects cannot be serialised — they always stay in-process
         self.active_connections: Dict[str, List[WebSocket]] = {}
-        self.rate_limits: Dict[WebSocket, Dict[str, any]] = {}
+        self.rate_limits: Dict[int, Dict[str, object]] = {}  # keyed by id(ws)
 
     async def connect(self, websocket: WebSocket, room_id: str, user_name: str) -> bool:
         if not validate_room_id(room_id) or not validate_username(user_name):
@@ -204,7 +242,7 @@ class ConnectionManager:
         state = await store.get(room_id)
 
         # Prevent duplicate usernames in the same room
-        if state and user_name in state.get('users', {}):
+        if state and user_name in state.users:
             await websocket.close(code=status.WS_1008_POLICY_VIOLATION,
                                   reason="Username already taken in this room.")
             return False
@@ -220,18 +258,18 @@ class ConnectionManager:
 
         if state is None:
             # Brand new room
-            state = {
-                'users': {},
-                'revealed': False,
-                'host': user_name,
-                'last_activity': time.time(),
-            }
-        
+            state = RoomState(
+                users={},
+                revealed=False,
+                host=user_name,
+                last_activity=time.time(),
+            )
+
         if room_id not in self.active_connections:
             self.active_connections[room_id] = []
 
-        state['users'][user_name] = {'vote': None, 'voted': False}
-        state['last_activity'] = time.time()
+        state.users[user_name] = UserState(vote=None, voted=False)
+        state.last_activity = time.time()
         await store.set(room_id, state)
 
         self.active_connections[room_id].append(websocket)
@@ -247,14 +285,14 @@ class ConnectionManager:
 
         state = await store.get(room_id)
         if state:
-            state['users'].pop(user_name, None)
+            state.users.pop(user_name, None)
 
             # Promote next user to host if host left
-            if state.get('host') == user_name:
-                remaining = list(state['users'].keys())
-                state['host'] = remaining[0] if remaining else None
+            if state.host == user_name:
+                remaining = list(state.users.keys())
+                state.host = remaining[0] if remaining else None
 
-            if state['users']:
+            if state.users:
                 await store.set(room_id, state)
             else:
                 # Last person left — delete the room
@@ -271,12 +309,16 @@ class ConnectionManager:
         if not state:
             return
 
-        state_to_send = {'users': {}, 'revealed': state['revealed'], 'host': state['host']}
-        for user, data in state['users'].items():
-            if state['revealed']:
-                state_to_send['users'][user] = data
+        state_to_send: Dict[str, object] = {
+            'users': {},
+            'revealed': state.revealed,
+            'host': state.host
+        }
+        for user, data in state.users.items():
+            if state.revealed:
+                state_to_send['users'][user] = data.model_dump()  # type: ignore[index]
             else:
-                state_to_send['users'][user] = {'voted': data['voted']}
+                state_to_send['users'][user] = {'voted': data.voted}  # type: ignore[index]
 
         dead_connections = []
         for connection in self.active_connections.get(room_id, []):
@@ -290,35 +332,35 @@ class ConnectionManager:
             if conn in conns:
                 conns.remove(conn)
 
-    async def process_vote(self, room_id: str, user_name: str, vote_value: str):
+    async def process_vote(self, room_id: str, user_name: str, vote_value: str) -> None:
         if vote_value not in ALLOWED_VOTES:
             return
         state = await store.get(room_id)
-        if state and user_name in state.get('users', {}):
-            if state.get('revealed'):
+        if state and user_name in state.users:
+            if state.revealed:
                 return
-            state['users'][user_name]['vote'] = vote_value
-            state['users'][user_name]['voted'] = True
-            state['last_activity'] = time.time()
+            state.users[user_name].vote = vote_value
+            state.users[user_name].voted = True
+            state.last_activity = time.time()
             await store.set(room_id, state)
             await self.broadcast_state(room_id)
 
-    async def reveal_votes(self, room_id: str):
+    async def reveal_votes(self, room_id: str) -> None:
         state = await store.get(room_id)
         if state:
-            state['revealed'] = True
-            state['last_activity'] = time.time()
+            state.revealed = True
+            state.last_activity = time.time()
             await store.set(room_id, state)
             await self.broadcast_state(room_id)
 
-    async def reset_votes(self, room_id: str):
+    async def reset_votes(self, room_id: str) -> None:
         state = await store.get(room_id)
         if state:
-            state['revealed'] = False
-            state['last_activity'] = time.time()
-            for user in state['users']:
-                state['users'][user]['vote'] = None
-                state['users'][user]['voted'] = False
+            state.revealed = False
+            state.last_activity = time.time()
+            for user in state.users.values():
+                user.vote = None
+                user.voted = False
             await store.set(room_id, state)
             await self.broadcast_state(room_id)
 
@@ -340,7 +382,7 @@ class ConnectionManager:
 
     async def get_host(self, room_id: str) -> Optional[str]:
         state = await store.get(room_id)
-        return state.get('host') if state else None
+        return state.host if state else None
 
 
 manager = ConnectionManager()
