@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.10.0] - 2026-02-28
+### Added
+- **Limpeza de Estados Inativos:** Implementado Garbage Collector que remove automaticamente salas sem atividade por mais de 2 horas, otimizando recursos do servidor.
+- **Endurecimento de CORS:** Removidas origens permissivas padrão; o servidor agora exige configuração explícita via `ALLOWED_ORIGINS` e emite alertas de segurança para configurações vulneráveis.
+
 ## [0.9.1] - 2026-02-28
 ### Added
 - **Versionamento Automatizado:** O frontend agora lê a versão diretamente de `package.json` através do Vite, eliminando a necessidade de atualizações manuais no código-fonte.

@@ -6,22 +6,16 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect, status
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Dict
 
-app = FastAPI()
+import asyncio
+import logging
 
-# --- CORS: reads from env var ALLOWED_ORIGINS (comma-separated) ---
-# Example: ALLOWED_ORIGINS=https://seusite.com.br,https://www.seusite.com.br
-_raw_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173")
-allowed_origins = [o.strip() for o in _raw_origins.split(",") if o.strip()]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# --- Logging Setup ---
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # --- Constants / Limits ---
+CLEANUP_INTERVAL = 30 * 60  # Check every 30 minutes
+INACTIVE_TIMEOUT = 2 * 60 * 60  # 2 hours of inactivity
 MAX_ROOM_ID_LEN   = 40
 MAX_USERNAME_LEN  = 30
 MAX_VOTE_LEN      = 4      # longest valid card is "☕" (4 bytes)
@@ -31,6 +25,42 @@ VALID_ROOM_RE     = re.compile(r'^[A-Za-z0-9\-_]{1,40}$')
 ALLOWED_VOTES     = {'0', '½', '1', '2', '3', '5', '8', '13', '21', '34', '55', '89', '?', '☕'}
 RATE_LIMIT_MSGS   = 10      # max messages per window
 RATE_LIMIT_WINDOW = 1.0     # window size in seconds
+
+app = FastAPI()
+
+async def cleanup_inactive_rooms():
+    """Background task to remove rooms with no activity for 2+ hours."""
+    while True:
+        await asyncio.sleep(CLEANUP_INTERVAL)
+        now = time.time()
+        rooms_to_delete = []
+        
+        for room_id, state in manager.room_states.items():
+            if now - state.get('last_activity', 0) > INACTIVE_TIMEOUT:
+                rooms_to_delete.append(room_id)
+        
+        for room_id in rooms_to_delete:
+            logger.info(f"🧹 GC: Removing inactive room {room_id}")
+            # Close any active connections (unlikely but safe)
+            connections = manager.active_connections.get(room_id, [])
+            for ws in list(connections):
+                try:
+                    await ws.close(code=status.WS_1001_GOING_AWAY, reason="Room expired due to inactivity.")
+                except:
+                    pass
+            
+            # Clean up manager states
+            if room_id in manager.active_connections:
+                del manager.active_connections[room_id]
+            if room_id in manager.room_states:
+                del manager.room_states[room_id]
+
+@app.on_event("startup")
+async def startup_event():
+    asyncio.create_task(cleanup_inactive_rooms())
+    logger.info("📡 Planning Poker API started. Inactivity cleanup task enabled.")
+
+# --- CORS: reads from env var ALLOWED_ORIGINS (comma-separated) ---
 
 
 def validate_room_id(room_id: str) -> bool:
@@ -74,9 +104,15 @@ class ConnectionManager:
 
         if room_id not in self.active_connections:
             self.active_connections[room_id] = []
-            self.room_states[room_id] = {'users': {}, 'revealed': False, 'host': user_name}
+            self.room_states[room_id] = {
+                'users': {}, 
+                'revealed': False, 
+                'host': user_name,
+                'last_activity': time.time()
+            }
 
         self.active_connections[room_id].append(websocket)
+        self.room_states[room_id]['last_activity'] = time.time()
         self.room_states[room_id]['users'][user_name] = {'vote': None, 'voted': False}
         await self.broadcast_state(room_id)
         return True
@@ -134,17 +170,20 @@ class ConnectionManager:
             # Don't allow changing vote after reveal
             if self.room_states[room_id].get('revealed'):
                 return
+            self.room_states[room_id]['last_activity'] = time.time()
             self.room_states[room_id]['users'][user_name]['vote'] = vote_value
             self.room_states[room_id]['users'][user_name]['voted'] = True
             await self.broadcast_state(room_id)
 
     async def reveal_votes(self, room_id: str):
         if room_id in self.room_states:
+            self.room_states[room_id]['last_activity'] = time.time()
             self.room_states[room_id]['revealed'] = True
             await self.broadcast_state(room_id)
 
     async def reset_votes(self, room_id: str):
         if room_id in self.room_states:
+            self.room_states[room_id]['last_activity'] = time.time()
             self.room_states[room_id]['revealed'] = False
             for user in self.room_states[room_id]['users']:
                 self.room_states[room_id]['users'][user]['vote'] = None
