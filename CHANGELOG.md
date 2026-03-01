@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.10.1] - 2026-02-28
+### Fixed
+- **Correção de Produção Dinâmica:** Implementado suporte a `VITE_APP_BASE` para permitir a instalação do app em sub-diretórios (ex: Hostinger subfolders).
+- **Protocolo WebSocket:** Adicionada correção automática de protocolo (HTTPS -> WSS) para evitar falhas de conexão em browsers modernos.
+- **Convite:** Corrigida a geração de link de convite para evitar barras duplas em caminhos customizados.
+
 ## [0.10.0] - 2026-02-28
 ### Added
 - **Limpeza de Estados Inativos:** Implementado Garbage Collector que remove automaticamente salas sem atividade por mais de 2 horas, otimizando recursos do servidor.

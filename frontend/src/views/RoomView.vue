@@ -227,7 +227,7 @@
           <span class="mx-2 opacity-50">|</span>
           <a href="https://docanto.net" target="_blank" class="hover:text-fuchsia-800 dark:hover:text-fuchsia-400 transition-colors font-black underline decoration-fuchsia-500/30 underline-offset-4">Vinicius do Canto</a>
         </div>
-        <span class="opacity-30 tracking-normal normal-case font-mono text-[8px]">v0.9.0</span>
+        <span class="opacity-30 tracking-normal normal-case font-mono text-[8px]">v{{ appVersion }}</span>
       </div>
     </footer>
 
@@ -272,7 +272,9 @@ const voteAverage = computed(() => {
   return Number.isInteger(avg) ? avg : avg.toFixed(1)
 })
 
-const WS_BASE = import.meta.env.VITE_WS_URL || 'ws://localhost:8000'
+const rawWsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:8000'
+// Ensure correct protocol (replace http/https with ws/wss)
+const WS_BASE = rawWsUrl.replace(/^http/, 'ws')
 
 const connect = () => {
   if (!userName.value) { router.push('/'); return }
@@ -298,8 +300,11 @@ onUnmounted(() => { if (reconnectTimer) clearTimeout(reconnectTimer); if (ws) { 
 
 const copyInviteLink = async () => {
   try {
-    const base = window.location.origin + import.meta.env.BASE_URL
-    await navigator.clipboard.writeText(`${base}?room=${roomId.value}`)
+    const origin = window.location.origin
+    const base = import.meta.env.BASE_URL
+    // Construct URL ensuring no double slashes and correct path
+    const fullBase = (origin + base).replace(/\/+$/, '')
+    await navigator.clipboard.writeText(`${fullBase}/?room=${roomId.value}`)
     copied.value = true
     setTimeout(() => { copied.value = false }, 2000)
   } catch (e) { console.error(e) }
