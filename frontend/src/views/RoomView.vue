@@ -43,6 +43,65 @@
       <!-- Right: Actions -->
       <div class="flex items-center gap-3 shrink-0">
         <ThemeToggle />
+
+        <!-- History button (shows only when there are rounds) -->
+        <div v-if="gameState.history.length > 0" class="relative">
+          <button
+            ref="historyBtnRef"
+            @click="toggleHistory"
+            class="flex items-center gap-1.5 px-2.5 py-2 rounded-xl text-xs font-bold bg-slate-950/5 dark:bg-white/10 hover:bg-slate-900/10 dark:hover:bg-white/20 text-black dark:text-white border border-slate-300 dark:border-white/10 transition-all"
+            title="Histórico de rodadas"
+          >
+            <span>📋</span>
+            <span class="hidden sm:inline">Histórico</span>
+            <span class="px-1.5 py-0.5 rounded-full bg-indigo-600 text-white text-[9px] font-black leading-none">
+              {{ gameState.history.length }}
+            </span>
+          </button>
+
+          <!-- Dropdown via Teleport to avoid stacking context clipping -->
+          <Teleport to="body">
+            <div
+              v-if="showHistory"
+              :style="historyPanelStyle"
+              class="fixed w-72 sm:w-96 rounded-2xl glass border border-slate-200 dark:border-white/10 shadow-2xl overflow-hidden"
+              style="z-index: 9998;"
+            >
+              <div class="p-3 border-b border-slate-200 dark:border-white/10 flex items-center justify-between">
+                <span class="text-xs font-black uppercase tracking-wider text-black dark:text-white">Histórico de rodadas</span>
+                <button @click="showHistory = false" class="text-slate-400 hover:text-black dark:hover:text-white text-sm">✕</button>
+              </div>
+              <div class="max-h-80 overflow-y-auto p-3 flex flex-col gap-3">
+                <div
+                  v-for="entry in [...gameState.history].reverse()"
+                  :key="entry.round"
+                  class="rounded-xl border border-slate-200 dark:border-white/10 bg-white/50 dark:bg-white/5 p-3"
+                >
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-[11px] font-black uppercase tracking-wider text-indigo-500">
+                      Rodada {{ entry.round }}
+                    </span>
+                    <span v-if="entry.average !== null" class="text-[11px] font-black px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
+                      Média: {{ entry.average }}
+                    </span>
+                    <span v-else class="text-[11px] text-slate-400 italic">Sem média</span>
+                  </div>
+                  <div class="flex flex-wrap gap-1.5">
+                    <div
+                      v-for="(vote, user) in entry.votes"
+                      :key="user"
+                      class="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10"
+                    >
+                      <span class="text-[10px] text-slate-500 dark:text-slate-400">{{ user }}</span>
+                      <span class="font-black text-xs text-black dark:text-white">{{ vote }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Teleport>
+        </div>
+
         <button
           v-if="isHost"
           @click="handleAction"
@@ -219,7 +278,6 @@
     </div>
 
     <!-- Clean spacer footer for revealed results state (when deck is gone) -->
-    <!-- Clean spacer footer for revealed results state (when deck is gone) -->
     <footer v-if="gameState.revealed" class="mt-20 mb-10 text-center px-4">
       <div class="text-[9px] text-black dark:text-slate-600 uppercase tracking-widest font-black flex flex-col items-center gap-1.5">
         <div class="flex items-center">
@@ -259,7 +317,7 @@ if (!userName.value) {
 const appVersion: string = __APP_VERSION__
 const { addToast } = useToast()
 
-const gameState = ref<GameState>({ users: {}, revealed: false, host: null, deck_type: (route.query.deck as DeckType) || 'fibonacci' })
+const gameState = ref<GameState>({ users: {}, revealed: false, host: null, deck_type: (route.query.deck as DeckType) || 'fibonacci', round_number: 0, history: [] })
 const myVote = ref<CardValue | null>(null)
 const copied = ref<boolean>(false)
 const wsStatus = ref<WsStatus>('connecting')
@@ -270,6 +328,25 @@ let reconnectTimer: ReturnType<typeof setTimeout> | null = null
 const deck = computed<readonly string[]>(() => DECKS[gameState.value.deck_type] ?? DECKS.fibonacci)
 
 const isHost = computed<boolean>(() => gameState.value.host === userName.value)
+const showHistory = ref<boolean>(false)
+const historyBtnRef = ref<HTMLElement | null>(null)
+const historyPanelPos = ref<{ top: number; right: number }>({ top: 0, right: 0 })
+
+const historyPanelStyle = computed(() => ({
+  top: `${historyPanelPos.value.top}px`,
+  right: `${historyPanelPos.value.right}px`,
+}))
+
+const toggleHistory = (): void => {
+  if (!showHistory.value && historyBtnRef.value) {
+    const rect = historyBtnRef.value.getBoundingClientRect()
+    historyPanelPos.value = {
+      top: rect.bottom + 8,
+      right: window.innerWidth - rect.right,
+    }
+  }
+  showHistory.value = !showHistory.value
+}
 
 const voteAverage = computed<number | string | null>(() => {
   if (!gameState.value.revealed) return null

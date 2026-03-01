@@ -15,6 +15,14 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+def _is_numeric(v: str) -> bool:
+    try:
+        float(v.replace('½', '0.5'))
+        return True
+    except ValueError:
+        return False
+
+
 # --- Constants / Limits ---
 CLEANUP_INTERVAL  = 30 * 60   # Check every 30 minutes
 INACTIVE_TIMEOUT  = 2 * 60 * 60  # 2 hours of inactivity
@@ -46,12 +54,20 @@ class UserState(BaseModel):
     voted: bool = False
 
 
+class RoundRecord(BaseModel):
+    round: int
+    votes: Dict[str, str]       # username -> vote string
+    average: Optional[float] = None
+
+
 class RoomState(BaseModel):
     users: Dict[str, UserState] = {}
     revealed: bool = False
     host: Optional[str] = None
     last_activity: float = 0.0
     deck_type: str = 'fibonacci'
+    round_number: int = 0
+    history: List[RoundRecord] = []
 
     def model_dump_json_safe(self) -> dict:
         """Returns a plain dict safe for JSON serialisation."""
@@ -335,6 +351,8 @@ class ConnectionManager:
             'revealed': state.revealed,
             'host': state.host,
             'deck_type': state.deck_type,
+            'round_number': state.round_number,
+            'history': [r.model_dump() for r in state.history],
         }
         for user, data in state.users.items():
             if state.revealed:
@@ -378,6 +396,14 @@ class ConnectionManager:
     async def reset_votes(self, room_id: str) -> None:
         state = await store.get(room_id)
         if state:
+            # Record finished round in history (only if votes were revealed)
+            if state.revealed:
+                votes = {u: d.vote for u, d in state.users.items() if d.voted and d.vote}
+                nums = [float(v) for v in votes.values() if v not in ('?', '☕') and _is_numeric(v)]
+                avg = round(sum(nums) / len(nums), 1) if nums else None
+                state.round_number += 1
+                record = RoundRecord(round=state.round_number, votes=votes, average=avg)
+                state.history = (state.history + [record])[-20:]   # keep last 20
             state.revealed = False
             state.last_activity = time.time()
             for user in state.users.values():

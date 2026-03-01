@@ -6,12 +6,21 @@ export interface UserData {
     voted: boolean
 }
 
+/** A completed voting round stored in history */
+export interface RoundRecord {
+    round: number
+    votes: Record<string, string>
+    average: number | null
+}
+
 /** Full game state received via WebSocket state_update messages */
 export interface GameState {
     users: Record<string, UserData>
     revealed: boolean
     host: string | null
     deck_type: DeckType
+    round_number: number
+    history: RoundRecord[]
 }
 
 /** Outgoing WebSocket message shape */

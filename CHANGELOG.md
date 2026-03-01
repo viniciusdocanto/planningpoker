@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.15.0] - 2026-03-01
+### Added
+- **Histórico de Rodadas:** Painel colapsável que exibe as últimas rodadas da sessão com votos por usuário e média. Gravado automaticamente ao resetar após revelar. Máximo de 20 rodadas.
+- **Backend:** Modelo `RoundRecord`, campos `round_number` e `history` em `RoomState`. Helper `_is_numeric` para cálculo da média.
+
 ## [0.14.0] - 2026-03-01
 ### Added
 - **Baralhos Customizáveis:** Host pode escolher entre Fibonacci, Potências de 2 e T-Shirt Sizes. A troca sincroniza o deck para todos, reseta votos e exibe um toast.
@@ -199,7 +204,7 @@
 - Badges de versão e licença no `README.md`
 
 ### Alterado
-- `package.json`: nome (`frontend` → `planning-poker`), versão (`0.0.0` → `0.3.0`), description, author, license e homepage adicionados
+- `package.json`: nome (`frontend` → `planning-poker`), "version": "0.15.0", description, author, license e homepage adicionados
 - `index.html`: título, lang, favicon e meta description atualizados
 - `README.md`: estrutura do projeto atualizada, `.env.example`, favicon e segurança adicionados
 - `frontend/.gitignore`: simplificado (a raiz já cobre tudo)
