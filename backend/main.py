@@ -256,6 +256,7 @@ class ConnectionManager:
         # WebSocket objects cannot be serialised — they always stay in-process
         self.active_connections: Dict[str, List[WebSocket]] = {}
         self.rate_limits: Dict[int, Dict[str, object]] = {}  # keyed by id(ws)
+        self.timer_tasks: Dict[str, asyncio.Task] = {}  # room_id -> active reveal task
 
     async def connect(self, websocket: WebSocket, room_id: str, user_name: str, deck_type: str = 'fibonacci') -> bool:
         if not validate_room_id(room_id) or not validate_username(user_name):
@@ -390,6 +391,11 @@ class ConnectionManager:
             await self.broadcast_state(room_id)
 
     async def reveal_votes(self, room_id: str) -> None:
+        # Cancel any pending auto-reveal timer
+        if room_id in self.timer_tasks:
+            self.timer_tasks[room_id].cancel()
+            del self.timer_tasks[room_id]
+
         state = await store.get(room_id)
         if state:
             state.revealed = True
@@ -399,6 +405,11 @@ class ConnectionManager:
             await self.broadcast_state(room_id)
 
     async def reset_votes(self, room_id: str) -> None:
+        # Cancel any pending auto-reveal timer
+        if room_id in self.timer_tasks:
+            self.timer_tasks[room_id].cancel()
+            del self.timer_tasks[room_id]
+
         state = await store.get(room_id)
         if state:
             # Record finished round in history (only if votes were revealed)
@@ -421,6 +432,11 @@ class ConnectionManager:
     async def set_deck_type(self, room_id: str, deck: str) -> None:
         if deck not in DECK_TYPES:
             return
+        # Cancel timer
+        if room_id in self.timer_tasks:
+            self.timer_tasks[room_id].cancel()
+            del self.timer_tasks[room_id]
+
         state = await store.get(room_id)
         if state:
             state.deck_type = deck
@@ -438,15 +454,42 @@ class ConnectionManager:
     async def start_timer(self, room_id: str, duration: int) -> None:
         """Start a countdown timer. duration is clamped to 10-300 seconds."""
         duration = max(10, min(300, duration))
+        
+        # Cancel existing task if any
+        if room_id in self.timer_tasks:
+            self.timer_tasks[room_id].cancel()
+            
         state = await store.get(room_id)
         if state and not state.revealed:
             state.timer_end = time.time() + duration
             state.timer_duration = duration
             state.last_activity = time.time()
             await store.set(room_id, state)
+            
+            # Schedule auto-reveal
+            self.timer_tasks[room_id] = asyncio.create_task(self._auto_reveal_after(room_id, duration))
+            
             await self.broadcast_state(room_id)
 
+    async def _auto_reveal_after(self, room_id: str, delay: int) -> None:
+        """Helper task to reveal votes after a delay."""
+        try:
+            await asyncio.sleep(delay)
+            # Check if still voting and timer is the same (handled by task management)
+            await self.reveal_votes(room_id)
+            logger.info(f"⏰ Auto-revealed room {room_id} after {delay}s")
+        except asyncio.CancelledError:
+            pass
+        except Exception as e:
+            logger.error(f"❌ Error in auto-reveal task for {room_id}: {e}")
+        finally:
+            self.timer_tasks.pop(room_id, None)
+
     async def cancel_timer(self, room_id: str) -> None:
+        if room_id in self.timer_tasks:
+            self.timer_tasks[room_id].cancel()
+            del self.timer_tasks[room_id]
+            
         state = await store.get(room_id)
         if state:
             state.timer_end = None

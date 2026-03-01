@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.16.1] - 2026-03-01
+### Fixed
+- **Auto-Reveal:** Agora o sistema revela os votos automaticamente assim que o temporizador chega a zero, garantindo o fluxo da reunião mesmo se o host se distrair.
+- **Sincronismo de Background:** Implementado via `asyncio.Task` no backend para garantir a execução do comando de revelação independente do estado do cliente.
+
 ## [0.16.0] - 2026-03-01
 ### Added
 - **Temporizador (Timer):** Host pode iniciar um contador regressivo de 30s, 60s ou 90s.
@@ -215,7 +220,7 @@
 - Badges de versão e licença no `README.md`
 
 ### Alterado
-- `package.json`: nome (`frontend` → `planning-poker`), "version": "0.16.0", description, author, license e homepage adicionados
+- `package.json`: nome (`frontend` → `planning-poker`), "version": "0.15.0", description, author, license e homepage adicionados
 - `index.html`: título, lang, favicon e meta description atualizados
 - `README.md`: estrutura do projeto atualizada, `.env.example`, favicon e segurança adicionados
 - `frontend/.gitignore`: simplificado (a raiz já cobre tudo)
