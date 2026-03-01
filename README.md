@@ -2,16 +2,17 @@
 
 > Estime tarefas com seu time em tempo real, sem recarregar a página.
 
-[![version](https://img.shields.io/badge/version-0.10.0-indigo.svg)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-0.15.1-indigo.svg)](CHANGELOG.md)
 [![license](https://img.shields.io/badge/license-MIT-purple.svg)](LICENSE)
 
 ## Tecnologias
 
 | Camada | Tecnologia |
 |---|---|
-| Backend | Python 3.8+ · FastAPI · WebSockets · CORS |
-| Frontend | Vue 3 · Vite · TailwindCSS v4 · Vue Router |
+| Backend | Python 3.12 · FastAPI · WebSockets · Pydantic v2 · Redis |
+| Frontend | Vue 3 · Vite · TypeScript · TailwindCSS v4 · Vue Router |
 | Estilização | Glassmorphism · Inter (Google Fonts) · gradientes |
+| Deploy | Render (backend + Redis) · GitHub Pages (frontend) |
 
 ## Pré-requisitos
 
@@ -41,15 +42,18 @@ Acesse em: **http://localhost:5173**
 
 ## Funcionalidades
 
-- 🚪 **Criar/entrar em sala** — ID aleatório de 20 caracteres
-- 🔗 **Link de convite** — compartilhe com um clique
+- 🚩 **Criar/entrar em sala** — ID aleatório de 20 caracteres ou ID personalizado
+- 🔗 **Link de convite** — compartilhe a sala com um clique
 - 👑 **Host da sala** — criador controla quando revelar as cartas
 - 🔑 **Passagem de host** — se o host sair, o próximo assume
-- 🃏 **Baralho Fibonacci** — 0, ½, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, ?, ☕
+- 🃏 **Baralhos customizáveis** — Fibonacci, Potências de 2 ou T-Shirt Sizes
 - 🕵️ **Votos ocultos** — revelados todos ao mesmo tempo
-- 📊 **Média automática** — calculada ao revelar
+- 📊 **Média automática** — calculada ao revelar (ignora ?, ☕)
+- 📋 **Histórico de rodadas** — dropdown no header com todas as estimativas da sessão
+- 🔔 **Notificações toast** — alertas ao entrar/sair da sala e mudanças de conexão
 - 🔄 **Reconexão automática** — resiste a quedas de conexão
-- 🎨 **Design premium** — glassmorphism, gradientes, mesa de feltro verde
+- 💾 **Persistência** — estado das salas sobrevive a reinicializações (Redis)
+- 🎨 **Design premium** — glassmorphism, gradientes, tema claro/escuro
 - 🔒 **Segurança** — validação server + client, CORS, whitelist de votos, limite de sala
 
 ## Estrutura

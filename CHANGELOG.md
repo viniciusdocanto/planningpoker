@@ -1,15 +1,19 @@
 # Changelog
 
+## [0.15.1] - 2026-03-01
+### Changed
+- **Deck via sessionStorage:** O tipo de baralho agora é armazenado no `sessionStorage` em vez de ser passado como query param `?deck=` na URL, mantendo a URL limpa e sem expor detalhes de implementação.
+
 ## [0.15.0] - 2026-03-01
 ### Added
-- **Histórico de Rodadas:** Painel colapsável que exibe as últimas rodadas da sessão com votos por usuário e média. Gravado automaticamente ao resetar após revelar. Máximo de 20 rodadas.
+- **Histórico de Rodadas:** Botão 📋 no header abre dropdown (via Teleport) com as últimas rodadas da sessão, mostrando votos por usuário e média. Gravado automaticamente ao resetar após revelar. Máximo de 20 rodadas.
 - **Backend:** Modelo `RoundRecord`, campos `round_number` e `history` em `RoomState`. Helper `_is_numeric` para cálculo da média.
 
 ## [0.14.0] - 2026-03-01
 ### Added
-- **Baralhos Customizáveis:** Host pode escolher entre Fibonacci, Potências de 2 e T-Shirt Sizes. A troca sincroniza o deck para todos, reseta votos e exibe um toast.
-- **Backend:** Novo campo `deck_type` em `RoomState`, action `set_deck`, constante `DECK_TYPES` com validação de cartas por baralho.
-- **Frontend:** Deck computado dinamicamente de `gameState.deck_type`, seletor de baralho host-only acima das cartas.
+- **Baralhos Customizáveis:** Criador da sala escolhe o tipo de baralho antes de entrar: Fibonacci, Potências de 2 ou T-Shirt Sizes. O deck é aplicado no momento da criação — não pode ser trocado durante a sessão.
+- **Backend:** Campo `deck_type` em `RoomState`, constante `DECK_TYPES`, action `set_deck` e query param `?deck=` no endpoint WebSocket.
+- **Frontend:** Seletor de baralho na tela inicial (apenas ao criar sala nova). Deck renderizado dinamicamente em tempo real sem flash de troca.
 
 ## [0.13.0] - 2026-03-01
 ### Added
