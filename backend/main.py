@@ -68,6 +68,8 @@ class RoomState(BaseModel):
     deck_type: str = 'fibonacci'
     round_number: int = 0
     history: List[RoundRecord] = []
+    timer_end: Optional[float] = None
+    timer_duration: int = 60
 
     def model_dump_json_safe(self) -> dict:
         """Returns a plain dict safe for JSON serialisation."""
@@ -81,7 +83,7 @@ class WsMessage(BaseModel):
     @field_validator('action')
     @classmethod
     def action_must_be_known(cls, v: str) -> str:
-        if v not in ('vote', 'reveal', 'reset', 'set_deck'):
+        if v not in ('vote', 'reveal', 'reset', 'set_deck', 'start_timer', 'cancel_timer'):
             raise ValueError(f'Unknown action: {v}')
         return v
 
@@ -353,6 +355,8 @@ class ConnectionManager:
             'deck_type': state.deck_type,
             'round_number': state.round_number,
             'history': [r.model_dump() for r in state.history],
+            'timer_end': state.timer_end,
+            'timer_duration': state.timer_duration,
         }
         for user, data in state.users.items():
             if state.revealed:
@@ -389,6 +393,7 @@ class ConnectionManager:
         state = await store.get(room_id)
         if state:
             state.revealed = True
+            state.timer_end = None   # clear timer on reveal
             state.last_activity = time.time()
             await store.set(room_id, state)
             await self.broadcast_state(room_id)
@@ -405,6 +410,7 @@ class ConnectionManager:
                 record = RoundRecord(round=state.round_number, votes=votes, average=avg)
                 state.history = (state.history + [record])[-20:]   # keep last 20
             state.revealed = False
+            state.timer_end = None   # clear timer on reset
             state.last_activity = time.time()
             for user in state.users.values():
                 user.vote = None
@@ -419,6 +425,7 @@ class ConnectionManager:
         if state:
             state.deck_type = deck
             state.revealed = False
+            state.timer_end = None
             state.last_activity = time.time()
             for user in state.users.values():
                 user.vote = None
@@ -426,6 +433,25 @@ class ConnectionManager:
             await store.set(room_id, state)
             host_name = state.host or ''
             await self.broadcast_event(room_id, 'deck_changed', host_name, deck_type=deck)
+            await self.broadcast_state(room_id)
+
+    async def start_timer(self, room_id: str, duration: int) -> None:
+        """Start a countdown timer. duration is clamped to 10-300 seconds."""
+        duration = max(10, min(300, duration))
+        state = await store.get(room_id)
+        if state and not state.revealed:
+            state.timer_end = time.time() + duration
+            state.timer_duration = duration
+            state.last_activity = time.time()
+            await store.set(room_id, state)
+            await self.broadcast_state(room_id)
+
+    async def cancel_timer(self, room_id: str) -> None:
+        state = await store.get(room_id)
+        if state:
+            state.timer_end = None
+            state.last_activity = time.time()
+            await store.set(room_id, state)
             await self.broadcast_state(room_id)
 
     def is_rate_limited(self, websocket: WebSocket) -> bool:
@@ -489,6 +515,18 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str, user_name: str,
                 if await manager.get_host(room_id) == user_name:
                     deck = str(data.get('value', ''))[:16]
                     await manager.set_deck_type(room_id, deck)
+
+            elif action == 'start_timer':
+                if await manager.get_host(room_id) == user_name:
+                    try:
+                        duration = int(str(data.get('value', '60')))
+                    except (ValueError, TypeError):
+                        duration = 60
+                    await manager.start_timer(room_id, duration)
+
+            elif action == 'cancel_timer':
+                if await manager.get_host(room_id) == user_name:
+                    await manager.cancel_timer(room_id)
 
     except WebSocketDisconnect:
         pass

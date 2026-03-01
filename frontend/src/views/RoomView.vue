@@ -102,6 +102,20 @@
           </Teleport>
         </div>
 
+        <!-- Timer controls (host only, when not revealed) -->
+        <div v-if="isHost && !gameState.revealed" class="flex items-center gap-1.5">
+          <template v-if="gameState.timer_end === null">
+            <span class="text-[10px] text-slate-400 hidden sm:inline">⏱</span>
+            <button v-for="secs in [30, 60, 90]" :key="secs"
+              @click="startTimer(secs)"
+              class="px-2 py-1.5 rounded-lg text-[11px] font-black bg-slate-950/5 dark:bg-white/10 hover:bg-indigo-500 hover:text-white text-black dark:text-slate-300 border border-slate-300 dark:border-white/10 transition-all"
+            >{{ secs }}s</button>
+          </template>
+          <button v-else @click="cancelTimer"
+            class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-black bg-rose-500/10 hover:bg-rose-500 hover:text-white text-rose-600 dark:text-rose-400 border border-rose-400/30 transition-all"
+          >❌ Cancelar timer</button>
+        </div>
+
         <button
           v-if="isHost"
           @click="handleAction"
@@ -123,6 +137,34 @@
 
     <!-- Table -->
     <div class="max-w-5xl mx-auto py-10 flex flex-col items-center">
+
+      <!-- Timer display (visible to all) -->
+      <div
+        v-if="timeLeft !== null && !gameState.revealed"
+        class="mb-6 flex flex-col items-center gap-1"
+      >
+        <div
+          class="relative w-20 h-20 flex items-center justify-center"
+        >
+          <svg class="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 80 80">
+            <circle cx="40" cy="40" r="34" fill="none" stroke-width="6"
+              class="stroke-slate-200 dark:stroke-white/10" />
+            <circle cx="40" cy="40" r="34" fill="none" stroke-width="6"
+              stroke-linecap="round"
+              :stroke-dasharray="213.6"
+              :stroke-dashoffset="213.6 * (1 - timerProgress)"
+              :class="timeLeft <= 10 ? 'stroke-rose-500 animate-pulse' : 'stroke-indigo-500'"
+              style="transition: stroke-dashoffset 0.5s linear;"
+            />
+          </svg>
+          <span
+            class="text-2xl font-black tabular-nums"
+            :class="timeLeft <= 10 ? 'text-rose-500' : 'text-black dark:text-white'"
+          >{{ timeLeft }}</span>
+        </div>
+        <span class="text-[10px] uppercase tracking-widest font-black text-slate-400">segundos</span>
+      </div>
+
 
       <!-- Empty state -->
       <div v-if="Object.keys(gameState.users).length === 0" class="text-center py-20 text-slate-600">
@@ -317,7 +359,7 @@ if (!userName.value) {
 const appVersion: string = __APP_VERSION__
 const { addToast } = useToast()
 
-const gameState = ref<GameState>({ users: {}, revealed: false, host: null, deck_type: (sessionStorage.getItem('poker-deck') as DeckType) || 'fibonacci', round_number: 0, history: [] })
+const gameState = ref<GameState>({ users: {}, revealed: false, host: null, deck_type: (sessionStorage.getItem('poker-deck') as DeckType) || 'fibonacci', round_number: 0, history: [], timer_end: null, timer_duration: 60 })
 const myVote = ref<CardValue | null>(null)
 const copied = ref<boolean>(false)
 const wsStatus = ref<WsStatus>('connecting')
@@ -328,6 +370,47 @@ let reconnectTimer: ReturnType<typeof setTimeout> | null = null
 const deck = computed<readonly string[]>(() => DECKS[gameState.value.deck_type] ?? DECKS.fibonacci)
 
 const isHost = computed<boolean>(() => gameState.value.host === userName.value)
+
+// --- Timer ---
+const timeLeft = ref<number | null>(null)
+let timerInterval: ReturnType<typeof setInterval> | null = null
+
+const timerProgress = computed<number>(() => {
+  if (timeLeft.value === null || gameState.value.timer_duration <= 0) return 1
+  return Math.max(0, timeLeft.value / gameState.value.timer_duration)
+})
+
+const startTimer = (secs: number): void => {
+  if (ws?.readyState === WebSocket.OPEN)
+    ws.send(JSON.stringify({ action: 'start_timer', value: String(secs) }))
+}
+
+const cancelTimer = (): void => {
+  if (ws?.readyState === WebSocket.OPEN)
+    ws.send(JSON.stringify({ action: 'cancel_timer' }))
+}
+
+const updateTimer = () => {
+  if (gameState.value.timer_end) {
+    const diff = gameState.value.timer_end - Date.now() / 1000
+    if (diff > 0) {
+      timeLeft.value = Math.ceil(diff)
+    } else {
+      timeLeft.value = 0
+    }
+  } else {
+    timeLeft.value = null
+  }
+}
+
+onMounted(() => {
+  timerInterval = setInterval(updateTimer, 500)
+})
+
+onUnmounted(() => {
+  if (timerInterval) clearInterval(timerInterval)
+})
+
 const showHistory = ref<boolean>(false)
 const historyBtnRef = ref<HTMLElement | null>(null)
 const historyPanelPos = ref<{ top: number; right: number }>({ top: 0, right: 0 })

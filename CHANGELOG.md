@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.16.0] - 2026-03-01
+### Added
+- **Temporizador (Timer):** Host pode iniciar um contador regressivo de 30s, 60s ou 90s.
+- **Sincronismo:** O tempo é sincronizado entre todos os participantes usando timestamps absolutos, garantindo precisão mesmo com latência.
+- **UI:** Display circular de countdown visível para todos acima da mesa, com alerta visual (pulsação em vermelho) nos últimos 10 segundos.
+- **Backend:** Suporte a ações `start_timer` e `cancel_timer` no WebSocket, com limpeza automática ao revelar ou resetar rodadas.
+
 ## [0.15.1] - 2026-03-01
 ### Changed
 - **Deck via sessionStorage:** O tipo de baralho agora é armazenado no `sessionStorage` em vez de ser passado como query param `?deck=` na URL, mantendo a URL limpa e sem expor detalhes de implementação.
@@ -208,7 +215,7 @@
 - Badges de versão e licença no `README.md`
 
 ### Alterado
-- `package.json`: nome (`frontend` → `planning-poker`), "version": "0.15.0", description, author, license e homepage adicionados
+- `package.json`: nome (`frontend` → `planning-poker`), "version": "0.16.0", description, author, license e homepage adicionados
 - `index.html`: título, lang, favicon e meta description atualizados
 - `README.md`: estrutura do projeto atualizada, `.env.example`, favicon e segurança adicionados
 - `frontend/.gitignore`: simplificado (a raiz já cobre tudo)

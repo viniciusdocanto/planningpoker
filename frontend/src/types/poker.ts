@@ -21,6 +21,8 @@ export interface GameState {
     deck_type: DeckType
     round_number: number
     history: RoundRecord[]
+    timer_end: number | null
+    timer_duration: number
 }
 
 /** Outgoing WebSocket message shape */
