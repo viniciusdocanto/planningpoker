@@ -279,7 +279,11 @@ const WS_BASE = rawWsUrl.replace(/^http/, 'ws')
 const connect = () => {
   if (!userName.value) { router.push('/'); return }
   ws = new WebSocket(`${WS_BASE}/ws/${roomId.value}/${encodeURIComponent(userName.value)}`)
-  ws.onopen = () => { wsStatus.value = 'connected'; if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null } }
+  ws.onopen = () => {
+    console.log('🔌 WebSocket: Conectado com sucesso!')
+    wsStatus.value = 'connected'
+    if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null }
+  }
   ws.onmessage = (e) => {
     try {
       const msg = JSON.parse(e.data)
@@ -291,8 +295,15 @@ const connect = () => {
       console.warn('Received invalid message from server:', err)
     }
   }
-  ws.onclose = () => { wsStatus.value = 'reconnecting'; reconnectTimer = setTimeout(connect, 3000) }
-  ws.onerror = () => ws.close()
+  ws.onclose = (event) => {
+    console.warn(`🔌 WebSocket: Conexão fechada (Código: ${event.code}). Tentando reconectar em 3s...`)
+    wsStatus.value = 'reconnecting'
+    reconnectTimer = setTimeout(connect, 3000)
+  }
+  ws.onerror = (err) => {
+    console.error('🔌 WebSocket: Erro detectado na conexão:', err)
+    ws.close()
+  }
 }
 
 onMounted(connect)

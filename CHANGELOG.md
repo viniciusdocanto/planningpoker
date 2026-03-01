@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.10.5] - 2026-03-01
+### Improved
+- **Resiliência de Rede:** Adicionados logs de diagnóstico detalhados para o WebSocket no console do navegador, facilitando a identificação de problemas de cold-start ou CORS.
+- **Sincronização:** Atualizada a URL padrão do backend para o novo endpoint no Render (`planningpoker-4nao.onrender.com`).
+
 ## [0.10.4] - 2026-02-28
 ### Added
 - **CI/CD Secrets:** Adicionado suporte à variável `VITE_APP_BASE` no GitHub Actions via Secrets do repositório.
