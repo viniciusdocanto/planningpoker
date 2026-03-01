@@ -45,7 +45,7 @@
         <ThemeToggle />
 
         <!-- History button (shows only when there are rounds) -->
-        <div v-if="gameState.history.length > 0" class="relative">
+        <div v-if="(gameState?.history?.length || 0) > 0" class="relative">
           <button
             ref="historyBtnRef"
             @click="toggleHistory"
@@ -55,7 +55,7 @@
             <span>📋</span>
             <span class="hidden sm:inline">Histórico</span>
             <span class="px-1.5 py-0.5 rounded-full bg-indigo-600 text-white text-[9px] font-black leading-none">
-              {{ gameState.history.length }}
+              {{ gameState?.history?.length || 0 }}
             </span>
           </button>
 
@@ -140,7 +140,7 @@
 
       <!-- Timer display (visible to all) -->
       <div
-        v-if="timeLeft !== null && !gameState.revealed"
+        v-if="timeLeft !== null && !(gameState?.revealed)"
         class="mb-6 flex flex-col items-center gap-1"
       >
         <div
@@ -232,19 +232,19 @@
           mb-10"
         >
           <div class="absolute inset-3 rounded-full border border-slate-300/50 dark:border-emerald-600/20 pointer-events-none"></div>
-          <template v-if="gameState.revealed && voteAverage !== null">
+          <template v-if="gameState?.revealed && voteAverage !== null">
             <div class="text-center">
               <span class="text-4xl font-black text-white drop-shadow-md">{{ voteAverage }}</span>
               <p class="text-[10px] text-emerald-200 font-bold mt-0.5 tracking-[0.2em] uppercase">média</p>
             </div>
           </template>
-          <template v-else-if="gameState.revealed">
+          <template v-else-if="gameState?.revealed">
             <span class="text-slate-400 dark:text-emerald-500/60 text-xs font-bold uppercase tracking-widest">Sem votos</span>
           </template>
           <template v-else>
             <div class="text-center">
               <p class="text-indigo-600 dark:text-white text-sm font-black drop-shadow-sm">
-                {{ Object.values(gameState.users).filter(u => u.voted).length }}/{{ Object.keys(gameState.users).length }}
+                {{ Object.values(gameState?.users || {}).filter(u => (u as any)?.voted).length }}/{{ Object.keys(gameState?.users || {}).length }}
               </p>
               <p class="text-slate-500 dark:text-emerald-300 text-[10px] font-bold uppercase tracking-widest mt-0.5">votaram</p>
             </div>
@@ -252,14 +252,14 @@
         </div>
 
         <!-- Non-host hint -->
-        <p v-if="!isHost && !gameState.revealed" class="text-xs text-slate-600 mb-4">
-          Aguardando <span class="text-yellow-500 font-medium">{{ gameState.host }}</span> revelar as cartas.
+        <p v-if="!(gameState?.revealed) && !isHost" class="text-xs text-slate-600 mb-4">
+          Aguardando <span class="text-yellow-500 font-medium">{{ gameState?.host || '...' }}</span> revelar as cartas.
         </p>
       </template>
     </div>
 
     <!-- Results panel after reveal -->
-    <div v-if="gameState.revealed" class="max-w-5xl mx-auto mb-6">
+    <div v-if="gameState?.revealed" class="max-w-5xl mx-auto mb-6">
       <div class="glass rounded-2xl p-6 border-slate-400 dark:border-white/5 shadow-2xl">
         <h2 class="text-sm font-black text-black dark:text-slate-300 uppercase tracking-widest mb-4">📊 Resultados</h2>
         <div class="flex flex-wrap gap-2">
@@ -286,7 +286,7 @@
     </div>
 
     <!-- Fixed card deck at bottom -->
-    <div v-if="!gameState.revealed" class="fixed bottom-0 left-0 w-full z-20">
+    <div v-if="!(gameState?.revealed)" class="fixed bottom-0 left-0 w-full z-20">
       <div class="glass border-t border-slate-300 dark:border-white/10 px-4 pt-2 pb-4 backdrop-blur-3xl shadow-[0_-20px_50px_rgba(0,0,0,0.15)]">
         <div class="max-w-5xl mx-auto flex flex-col gap-6">
           <!-- Scrollable Deck Area (Height fixed to prevent clipping) -->
@@ -320,7 +320,7 @@
     </div>
 
     <!-- Clean spacer footer for revealed results state (when deck is gone) -->
-    <footer v-if="gameState.revealed" class="mt-20 mb-10 text-center px-4">
+    <footer v-if="gameState?.revealed" class="mt-20 mb-10 text-center px-4">
       <div class="text-[9px] text-black dark:text-slate-600 uppercase tracking-widest font-black flex flex-col items-center gap-1.5">
         <div class="flex items-center">
           <a href="https://github.com/viniciusdocanto/planningpoker" target="_blank" class="hover:text-indigo-800 dark:hover:text-indigo-400 transition-colors">Open Source</a>
@@ -378,8 +378,9 @@ const timeLeft = ref<number | null>(null)
 let timerInterval: ReturnType<typeof setInterval> | null = null
 
 const timerProgress = computed<number>(() => {
-  if (timeLeft.value === null || !gameState.value?.timer_duration || gameState.value.timer_duration <= 0) return 1
-  return Math.max(0, timeLeft.value / gameState.value.timer_duration)
+  const duration = gameState.value?.timer_duration ?? 60
+  if (timeLeft.value === null || duration <= 0) return 1
+  return Math.max(0, timeLeft.value / duration)
 })
 
 const startTimer = (secs: number): void => {
@@ -393,8 +394,9 @@ const cancelTimer = (): void => {
 }
 
 const updateTimer = () => {
-  if (gameState.value.timer_end) {
-    const diff = gameState.value.timer_end - Date.now() / 1000
+  const end = gameState.value?.timer_end
+  if (end) {
+    const diff = end - Date.now() / 1000
     if (diff > 0) {
       timeLeft.value = Math.ceil(diff)
     } else {
@@ -462,11 +464,17 @@ const connect = (): void => {
       const msg = JSON.parse(e.data) as WsServerMessage
       if (msg.type === 'state_update' && msg.data) {
         const wasRevealed = gameState.value?.revealed ?? false
-        gameState.value = msg.data
         
-        // Safety: Ensure history and users are always defined to prevent template crashes
-        if (!gameState.value.history) gameState.value.history = []
-        if (!gameState.value.users) gameState.value.users = {}
+        // Use a temporary object to ensure all defaults are applied before replacing the ref
+        const rawData = msg.data as any
+        const updatedState: GameState = {
+          ...gameState.value,
+          ...rawData,
+          users: rawData.users || {},
+          history: rawData.history || []
+        }
+        
+        gameState.value = updatedState
 
         // Play reveal sound only once when state changes to revealed
         if (gameState.value.revealed && !wasRevealed) {

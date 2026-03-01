@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.17.1] - 2026-03-01
+### Fixed
+- **Hotfix (Timer & Histórico):** Corrigida regressão que fazia o histórico sumir e o temporizador falhar devido a falhas de sincronia de estado e falta de checks no template.
+- **Merge de Estado:** Implementada fusão inteligente de estado no WebSocket para garantir persistência de dados parciais.
+
 ## [0.17.0] - 2026-03-01
 ### Added
 - **Feedback Sensorial:** Implementado feedback háptico (vibração de 40ms) ao votar e feedback sonoro (sons de clique e revelação) via Web Audio API.
