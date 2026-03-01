@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.18.0] - 2026-03-01
+### Added
+- **Internacionalização (I18n):** Suporte completo para Português, Inglês e Espanhol usando `vue-i18n`.
+- **Seletor de Idiomas:** Novo componente `LanguageSelector` no header para troca dinâmica de idioma com persistência no `localStorage`.
+- **Testes E2E:** Implementada suíte de testes com Playwright cobrindo o fluxo completo (Criar -> Votar -> Revelar -> Resetar).
+- **Localização de Decks:** Nomes dos baralhos (Fibonacci, Potências, T-Shirt) agora são traduzidos.
+
 ## [0.17.1] - 2026-03-01
 ### Fixed
 - **Hotfix (Timer & Histórico):** Corrigida regressão que fazia o histórico sumir e o temporizador falhar devido a falhas de sincronia de estado e falta de checks no template.

@@ -2,7 +2,7 @@
 
 > Estime tarefas com seu time em tempo real, sem recarregar a página.
 
-[![version](https://img.shields.io/badge/version-0.17.1-indigo.svg)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-0.18.0-indigo.svg)](CHANGELOG.md)
 [![license](https://img.shields.io/badge/license-MIT-purple.svg)](LICENSE)
 
 ## Tecnologias
@@ -10,7 +10,8 @@
 | Camada | Tecnologia |
 |---|---|
 | Backend | Python 3.12 · FastAPI · WebSockets · Pydantic v2 · Redis |
-| Frontend | Vue 3 · Vite · TypeScript · TailwindCSS v4 · Vue Router |
+| Frontend | Vue 3 · Vite · TypeScript · TailwindCSS v4 · Vue Router · **Vue I18n** |
+| Testes | **Playwright (E2E)** |
 | Estilização | Glassmorphism · Inter (Google Fonts) · gradientes |
 | Deploy | Render (backend + Redis) · GitHub Pages (frontend) |
 
@@ -57,6 +58,8 @@ Acesse em: **http://localhost:5173**
 - 🎨 **Design premium** — glassmorphism, gradientes, tema claro/escuro
 - 🔒 **Segurança** — validação server + client, CORS, whitelist de votos, limite de sala
 - 🔊 **Feedback Sensorial** — sons sutis ao revelar cartas e vibração (mobile) ao votar
+- 🌍 **Internacionalização (I18n)** — suporte para Português, Inglês e Espanhol
+- 🧪 **Testes E2E** — suíte de testes robusta com Playwright para garantir fluxos críticos
 - 🛡️ **Robustez** — tratamento de erros defensivos para evitar falhas de interface em produção
 
 ## Estrutura

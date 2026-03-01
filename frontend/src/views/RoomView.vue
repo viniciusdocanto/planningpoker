@@ -26,12 +26,12 @@
             <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-green-600 dark:text-green-400" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
             </svg>
-            {{ copied ? 'Copiado!' : 'Compartilhar' }}
+            {{ copied ? $t('room.copied') : $t('room.share') }}
           </button>
         </div>
         <div class="flex items-center gap-2 text-[10px] text-black dark:text-slate-500 uppercase tracking-wider font-black">
           <span>{{ userName }}</span>
-          <span v-if="isHost" class="text-amber-700 dark:text-yellow-400 font-bold">👑 Host</span>
+          <span v-if="isHost" class="text-amber-700 dark:text-yellow-400 font-bold">👑 {{ $t('room.host') }}</span>
           <!-- WS status dot -->
           <span class="flex items-center gap-1" :class="wsStatus === 'connected' ? 'text-green-600 dark:text-green-500' : 'text-amber-700 dark:text-yellow-500 animate-pulse-soft'">
             · <span class="w-1.5 h-1.5 rounded-full inline-block" :class="wsStatus === 'connected' ? 'bg-green-600 dark:bg-green-500' : 'bg-amber-700 dark:bg-yellow-500'"></span>
@@ -50,10 +50,10 @@
             ref="historyBtnRef"
             @click="toggleHistory"
             class="flex items-center gap-1.5 px-2.5 py-2 rounded-xl text-xs font-bold bg-slate-950/5 dark:bg-white/10 hover:bg-slate-900/10 dark:hover:bg-white/20 text-black dark:text-white border border-slate-300 dark:border-white/10 transition-all"
-            title="Histórico de rodadas"
+            :title="$t('room.historyTitle')"
           >
             <span>📋</span>
-            <span class="hidden sm:inline">Histórico</span>
+            <span class="hidden sm:inline">{{ $t('room.history') }}</span>
             <span class="px-1.5 py-0.5 rounded-full bg-indigo-600 text-white text-[9px] font-black leading-none">
               {{ gameState?.history?.length || 0 }}
             </span>
@@ -68,7 +68,7 @@
               style="z-index: 9998;"
             >
               <div class="p-3 border-b border-slate-200 dark:border-white/10 flex items-center justify-between">
-                <span class="text-xs font-black uppercase tracking-wider text-black dark:text-white">Histórico de rodadas</span>
+                <span class="text-xs font-black uppercase tracking-wider text-black dark:text-white">{{ $t('room.historyTitle') }}</span>
                 <button @click="showHistory = false" class="text-slate-400 hover:text-black dark:hover:text-white text-sm">✕</button>
               </div>
               <div class="max-h-80 overflow-y-auto p-3 flex flex-col gap-3">
@@ -79,12 +79,12 @@
                 >
                   <div class="flex items-center justify-between mb-2">
                     <span class="text-[11px] font-black uppercase tracking-wider text-indigo-500">
-                      Rodada {{ entry.round }}
+                      {{ $t('room.round') }} {{ entry.round }}
                     </span>
                     <span v-if="entry.average !== null" class="text-[11px] font-black px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
-                      Média: {{ entry.average }}
+                      {{ $t('room.average') }}: {{ entry.average }}
                     </span>
-                    <span v-else class="text-[11px] text-slate-400 italic">Sem média</span>
+                    <span v-else class="text-[11px] text-slate-400 italic">{{ $t('room.noAverage') }}</span>
                   </div>
                   <div class="flex flex-wrap gap-1.5">
                     <div
@@ -113,7 +113,7 @@
           </template>
           <button v-else @click="cancelTimer"
             class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-black bg-rose-500/10 hover:bg-rose-500 hover:text-white text-rose-600 dark:text-rose-400 border border-rose-400/30 transition-all"
-          >❌ Cancelar timer</button>
+          >{{ $t('room.cancelTimer') }}</button>
         </div>
 
         <button
@@ -124,13 +124,13 @@
             ? 'bg-gradient-to-r from-rose-500 to-rose-600 shadow-rose-500/20 hover:opacity-90'
             : 'bg-gradient-to-r from-indigo-500 to-purple-600 shadow-indigo-500/20 hover:opacity-90'"
         >
-          {{ gameState.revealed ? 'Resetar' : 'Revelar' }}
+          {{ gameState.revealed ? $t('room.reset') : $t('room.reveal') }}
         </button>
         <button
           @click="leaveRoom"
           class="px-4 py-2 rounded-xl text-black dark:text-white font-black text-sm bg-slate-950/5 dark:bg-white/10 hover:bg-slate-900/10 dark:hover:bg-white/20 transition-all active:scale-95"
         >
-          Sair
+          {{ $t('room.leave') }}
         </button>
       </div>
     </header>
@@ -162,7 +162,7 @@
             :class="timeLeft <= 10 ? 'text-rose-500' : 'text-black dark:text-white'"
           >{{ timeLeft }}</span>
         </div>
-        <span class="text-[10px] uppercase tracking-widest font-black text-slate-400">segundos</span>
+        <span class="text-[10px] uppercase tracking-widest font-black text-slate-400">{{ $t('room.seconds') }}</span>
       </div>
 
 
@@ -171,8 +171,8 @@
         <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14 mx-auto mb-4 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
-        <p class="text-lg font-medium text-slate-500">Aguardando jogadores...</p>
-        <p class="text-sm mt-1 text-slate-600">Compartilhe o link para convidar o time!</p>
+        <p class="text-lg font-medium text-slate-500">{{ $t('room.waitingPlayers') }}</p>
+        <p class="text-sm mt-1 text-slate-600">{{ $t('room.inviteHint') }}</p>
       </div>
 
       <template v-else>
@@ -215,11 +215,11 @@
                 :class="user === userName ? 'text-indigo-900 dark:text-indigo-400' : 'text-black dark:text-slate-300'"
               >
                 <span v-if="user === gameState.host" class="text-amber-700 dark:text-yellow-400 tracking-tighter">👑</span>
-                {{ user === userName ? 'Você' : user }}
+                {{ user === userName ? $t('room.you') : user }}
               </span>
-              <span v-if="data.voted && !gameState.revealed" class="text-[10px] text-green-600 dark:text-green-400 font-bold tracking-wide uppercase">Votou</span>
-              <span v-if="!data.voted && !gameState.revealed" class="text-[10px] text-amber-600/80 dark:text-yellow-500/80 font-medium tracking-wide">pensando...</span>
-              <span v-if="gameState.revealed && !data.voted" class="text-[10px] text-slate-500 dark:text-slate-600">não votou</span>
+              <span v-if="data.voted && !gameState.revealed" class="text-[10px] text-green-600 dark:text-green-400 font-bold tracking-wide uppercase">{{ $t('room.voted') }}</span>
+              <span v-if="!data.voted && !gameState.revealed" class="text-[10px] text-amber-600/80 dark:text-yellow-500/80 font-medium tracking-wide">{{ $t('room.thinking') }}</span>
+              <span v-if="gameState.revealed && !data.voted" class="text-[10px] text-slate-500 dark:text-slate-600">{{ $t('room.didntVote') }}</span>
             </div>
           </div>
         </div>
@@ -235,25 +235,24 @@
           <template v-if="gameState?.revealed && voteAverage !== null">
             <div class="text-center">
               <span class="text-4xl font-black text-white drop-shadow-md">{{ voteAverage }}</span>
-              <p class="text-[10px] text-emerald-200 font-bold mt-0.5 tracking-[0.2em] uppercase">média</p>
+              <p class="text-[10px] text-emerald-200 font-bold mt-0.5 tracking-[0.2em] uppercase">{{ $t('room.average') }}</p>
             </div>
           </template>
           <template v-else-if="gameState?.revealed">
-            <span class="text-slate-400 dark:text-emerald-500/60 text-xs font-bold uppercase tracking-widest">Sem votos</span>
+            <span class="text-slate-400 dark:text-emerald-500/60 text-xs font-bold uppercase tracking-widest">{{ $t('room.noVotes') }}</span>
           </template>
           <template v-else>
             <div class="text-center">
               <p class="text-indigo-600 dark:text-white text-sm font-black drop-shadow-sm">
-                {{ Object.values(gameState?.users || {}).filter(u => (u as any)?.voted).length }}/{{ Object.keys(gameState?.users || {}).length }}
+                {{ $t('room.votesCount', { count: Object.values(gameState?.users || {}).filter(u => (u as any)?.voted).length, total: Object.keys(gameState?.users || {}).length }) }}
               </p>
-              <p class="text-slate-500 dark:text-emerald-300 text-[10px] font-bold uppercase tracking-widest mt-0.5">votaram</p>
             </div>
           </template>
         </div>
 
         <!-- Non-host hint -->
         <p v-if="!(gameState?.revealed) && !isHost" class="text-xs text-slate-600 mb-4">
-          Aguardando <span class="text-yellow-500 font-medium">{{ gameState?.host || '...' }}</span> revelar as cartas.
+          {{ $t('room.waitingHost', { host: gameState?.host || '...' }) }}
         </p>
       </template>
     </div>
@@ -261,7 +260,7 @@
     <!-- Results panel after reveal -->
     <div v-if="gameState?.revealed" class="max-w-5xl mx-auto mb-6">
       <div class="glass rounded-2xl p-6 border-slate-400 dark:border-white/5 shadow-2xl">
-        <h2 class="text-sm font-black text-black dark:text-slate-300 uppercase tracking-widest mb-4">📊 Resultados</h2>
+        <h2 class="text-sm font-black text-black dark:text-slate-300 uppercase tracking-widest mb-4">{{ $t('room.results') }}</h2>
         <div class="flex flex-wrap gap-2">
           <div
             v-for="(data, user) in (gameState.users || {})"
@@ -269,18 +268,18 @@
             class="flex items-center gap-2 bg-slate-950/5 dark:bg-white/5 rounded-xl px-4 py-2.5 border border-slate-400 dark:border-white/[0.06]"
           >
             <span v-if="user === gameState.host" class="text-amber-800 dark:text-yellow-400 text-xs">👑</span>
-            <span class="text-sm font-black text-black dark:text-slate-300">{{ user === userName ? 'Você' : user }}</span>
+            <span class="text-sm font-black text-black dark:text-slate-300">{{ user === userName ? $t('room.you') : user }}</span>
             <span class="font-bold text-sm px-2 py-0.5 rounded-lg"
               :class="data.voted ? 'bg-indigo-500/30 text-indigo-300' : 'bg-white/5 text-slate-600'"
             >{{ data.voted ? data.vote : '—' }}</span>
           </div>
         </div>
         <div v-if="voteAverage !== null" class="mt-4 pt-4 border-t border-slate-400 dark:border-white/5 flex items-center gap-3">
-          <span class="text-xs font-black text-black dark:text-slate-500 uppercase tracking-wider">Média</span>
+          <span class="text-xs font-black text-black dark:text-slate-500 uppercase tracking-wider">{{ $t('room.average') }}</span>
           <span class="text-3xl font-black text-gradient">{{ voteAverage }}</span>
         </div>
         <p v-if="isHost" class="mt-3 text-[10px] font-black text-black dark:text-slate-600 uppercase tracking-wide">
-          Rodada encerrada. Clique em <span class="text-rose-600 dark:text-rose-400">Resetar</span> no topo para recomeçar.
+          {{ $t('room.roundEnded') }}
         </p>
       </div>
     </div>
@@ -308,9 +307,9 @@
           <footer class="pb-1 text-center">
             <div class="text-[9px] text-black dark:text-slate-600 uppercase tracking-widest font-black flex flex-col items-center gap-1.5">
               <div class="flex items-center">
-                <a href="https://github.com/viniciusdocanto/planningpoker" target="_blank" class="hover:text-indigo-800 dark:hover:text-indigo-400 transition-colors">Open Source</a>
+                <a href="https://github.com/viniciusdocanto/planningpoker" target="_blank" class="hover:text-indigo-800 dark:hover:text-indigo-400 transition-colors">{{ $t('common.openSource') }}</a>
                 <span class="mx-2 opacity-50">|</span>
-                <a href="https://docanto.net" target="_blank" class="hover:text-fuchsia-800 dark:hover:text-fuchsia-400 transition-colors font-black underline decoration-fuchsia-500/30 underline-offset-4">Vinicius do Canto</a>
+                <a href="https://docanto.net" target="_blank" class="hover:text-fuchsia-800 dark:hover:text-fuchsia-400 transition-colors font-black underline decoration-fuchsia-500/30 underline-offset-4">{{ $t('common.by') }}</a>
               </div>
               <span class="opacity-30 tracking-normal normal-case font-mono text-[8px]">v{{ appVersion }}</span>
             </div>
@@ -323,9 +322,9 @@
     <footer v-if="gameState?.revealed" class="mt-20 mb-10 text-center px-4">
       <div class="text-[9px] text-black dark:text-slate-600 uppercase tracking-widest font-black flex flex-col items-center gap-1.5">
         <div class="flex items-center">
-          <a href="https://github.com/viniciusdocanto/planningpoker" target="_blank" class="hover:text-indigo-800 dark:hover:text-indigo-400 transition-colors">Open Source</a>
+          <a href="https://github.com/viniciusdocanto/planningpoker" target="_blank" class="hover:text-indigo-800 dark:hover:text-indigo-400 transition-colors">{{ $t('common.openSource') }}</a>
           <span class="mx-2 opacity-50">|</span>
-          <a href="https://docanto.net" target="_blank" class="hover:text-fuchsia-800 dark:hover:text-fuchsia-400 transition-colors font-black underline decoration-fuchsia-500/30 underline-offset-4">Vinicius do Canto</a>
+          <a href="https://docanto.net" target="_blank" class="hover:text-fuchsia-800 dark:hover:text-fuchsia-400 transition-colors font-black underline decoration-fuchsia-500/30 underline-offset-4">{{ $t('common.by') }}</a>
         </div>
         <span class="opacity-30 tracking-normal normal-case font-mono text-[8px]">v{{ appVersion }}</span>
       </div>
@@ -344,7 +343,9 @@ import type { GameState, WsServerMessage, WsStatus, CardValue, DeckType } from '
 import { DECKS, DECK_LABELS } from '../types/poker'
 import { useToast } from '../composables/useToast'
 import { useFeedback } from '../composables/useFeedback'
+import { useI18n } from 'vue-i18n'
 
+const { t: $t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const roomId = ref<string>(String(route.params.id))
@@ -454,10 +455,10 @@ const connect = (): void => {
   const deckParam = sessionStorage.getItem('poker-deck') || 'fibonacci'
   ws = new WebSocket(`${WS_BASE}/ws/${roomId.value}/${encodeURIComponent(userName.value)}?deck=${encodeURIComponent(deckParam)}`)
   ws.onopen = () => {
-    console.log('🔌 WebSocket: Conectado com sucesso!')
+    console.log('🔌 WebSocket: Connected!')
     wsStatus.value = 'connected'
     if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null }
-    addToast('Conectado à sala!', 'success')
+    addToast($t('room.connected'), 'success')
   }
   ws.onmessage = (e: MessageEvent<string>) => {
     try {
@@ -485,12 +486,12 @@ const connect = (): void => {
         if (me && !me.voted) myVote.value = null
       } else if (msg.type === 'event_notify') {
         if (msg.event === 'user_joined' && msg.user !== userName.value) {
-          addToast(`${msg.user} entrou na sala`, 'info')
+          addToast($t('room.userJoined', { user: msg.user || '?' }), 'info')
         } else if (msg.event === 'user_left' && msg.user !== userName.value) {
-          addToast(`${msg.user} saiu da sala`, 'warning')
+          addToast($t('room.userLeft', { user: msg.user || '?' }), 'warning')
         } else if (msg.event === 'deck_changed') {
-          const label = msg.deck_type ? DECK_LABELS[msg.deck_type] : 'desconhecido'
-          addToast(`Baralho alterado para ${label}`, 'info')
+          const label = msg.deck_type ? $t(`decks.${msg.deck_type}`) : '?'
+          addToast($t('room.deckChanged', { deck: label }), 'info')
         }
       }
     } catch (err) {
@@ -498,7 +499,7 @@ const connect = (): void => {
     }
   }
   ws.onclose = (event: CloseEvent) => {
-    console.warn(`🔌 WebSocket: Conexão fechada (Código: ${event.code}). Tentando reconectar em 3s...`)
+    console.warn(`🔌 WebSocket: Connection closed (Code: ${event.code}). Reconnecting...`)
     wsStatus.value = 'reconnecting'
     reconnectTimer = setTimeout(connect, 3000)
     if (event.code !== 1000 && event.code !== 1001) {
@@ -506,7 +507,7 @@ const connect = (): void => {
     }
   }
   ws.onerror = (err: Event) => {
-    console.error('🔌 WebSocket: Erro detectado na conexão:', err)
+    console.error('🔌 WebSocket: Error:', err)
     ws?.close()
   }
 }

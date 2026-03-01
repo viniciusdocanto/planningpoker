@@ -72,6 +72,10 @@ frontend/dist/
 frontend/dist-ssr/
 frontend/.vite/
 
+# Playwright
+frontend/playwright-report/
+frontend/test-results/
+
 # Local env files (keep .env.example, ignore real secrets)
 frontend/.env
 frontend/.env.local

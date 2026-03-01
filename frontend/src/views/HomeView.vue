@@ -1,8 +1,9 @@
 <template>
   <div class="min-h-screen flex flex-col items-center justify-center p-4 relative">
 
-    <!-- Theme Toggle -->
-    <div class="fixed top-6 right-6 z-50">
+    <!-- Top Controls -->
+    <div class="fixed top-6 right-6 z-50 flex items-center gap-3">
+      <LanguageSelector />
       <ThemeToggle />
     </div>
 
@@ -13,9 +14,9 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3H5a2 2 0 00-2 2v14a2 2 0 002 2h4m6-16h4a2 2 0 012 2v14a2 2 0 01-2 2h-4m-6 0V3" />
         </svg>
       </div>
-      <h1 class="text-5xl font-extrabold tracking-tight text-gradient mb-3">Planning Poker</h1>
+      <h1 class="text-5xl font-extrabold tracking-tight text-gradient mb-3">{{ $t('home.title') }}</h1>
       <p class="text-black dark:text-slate-400 text-lg max-w-sm font-black">
-        Estime tarefas com seu time em tempo real, de forma simples e divertida.
+        {{ $t('home.tagline') }}
       </p>
     </div>
 
@@ -31,24 +32,24 @@
             </svg>
           </div>
           <div class="min-w-0">
-            <p class="text-[10px] text-indigo-800 dark:text-indigo-400 font-black uppercase tracking-wider mb-0.5">Entrando na sala</p>
+            <p class="text-[10px] text-indigo-800 dark:text-indigo-400 font-black uppercase tracking-wider mb-0.5">{{ $t('home.enteringRoom') }}</p>
             <p class="text-black dark:text-white font-mono text-sm truncate" :title="roomId">{{ roomId }}</p>
           </div>
         </div>
       </template>
 
       <template v-else>
-        <h2 class="text-xl font-black text-black dark:text-white mb-6">Entrar ou criar sala</h2>
+        <h2 class="text-xl font-black text-black dark:text-white mb-6">{{ $t('home.joinOrCreate') }}</h2>
       </template>
 
       <div class="space-y-4">
         <!-- Name Input -->
         <div>
-          <label class="block text-xs font-black text-black dark:text-slate-400 uppercase tracking-wider mb-2">Seu nome</label>
+          <label class="block text-xs font-black text-black dark:text-slate-400 uppercase tracking-wider mb-2">{{ $t('home.yourName') }}</label>
           <input
             v-model="userName"
             type="text"
-            placeholder="Como devemos te chamar?"
+            :placeholder="$t('home.namePlaceholder')"
             autofocus
             @keyup.enter="handleAction"
             class="w-full bg-slate-950/5 dark:bg-white/5 border border-slate-500 dark:border-white/10 rounded-xl px-4 py-3.5 text-black dark:text-white placeholder-slate-700 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500/40 transition-all text-sm font-black"
@@ -57,11 +58,11 @@
 
         <!-- Room ID Input (only if NOT joining via link) -->
         <div v-if="!isJoiningViaLink">
-          <label class="block text-xs font-black text-black dark:text-slate-400 uppercase tracking-wider mb-2">ID da sala <span class="normal-case font-normal text-slate-700 dark:text-slate-500">(opcional)</span></label>
+          <label class="block text-xs font-black text-black dark:text-slate-400 uppercase tracking-wider mb-2">{{ $t('home.roomId') }} <span class="normal-case font-normal text-slate-700 dark:text-slate-500">{{ $t('home.optional') }}</span></label>
           <input
             v-model="roomId"
             type="text"
-            placeholder="Deixe em branco para criar uma nova"
+            :placeholder="$t('home.roomPlaceholder')"
             @keyup.enter="handleAction"
             class="w-full bg-slate-950/5 dark:bg-white/5 border border-slate-500 dark:border-white/10 rounded-xl px-4 py-3.5 text-black dark:text-white placeholder-slate-700 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 focus:border-indigo-500/40 transition-all text-sm font-black"
           >
@@ -69,7 +70,7 @@
 
         <!-- Deck type selector (only when creating a new room) -->
         <div v-if="!isJoiningViaLink && !roomId.trim()">
-          <label class="block text-xs font-black text-black dark:text-slate-400 uppercase tracking-wider mb-2">Tipo de baralho</label>
+          <label class="block text-xs font-black text-black dark:text-slate-400 uppercase tracking-wider mb-2">{{ $t('home.deckType') }}</label>
           <div class="flex gap-2">
             <button
               v-for="(label, type) in DECK_LABELS"
@@ -86,7 +87,7 @@
           </div>
         </div>
 
-        <!-- Action Button (v0.6.7 fix: text-white for visibility) -->
+        <!-- Action Button -->
         <button
           @click="handleAction"
           :disabled="!isNameValid"
@@ -98,7 +99,7 @@
             active:scale-[0.98]"
         >
           <span class="relative z-10 flex items-center justify-center gap-2">
-            {{ isJoiningViaLink || roomId.trim() ? '🚀 Entrar na sala' : '✨ Criar nova sala' }}
+            {{ isJoiningViaLink || roomId.trim() ? $t('home.joinRoom') : $t('home.createRoom') }}
           </span>
         </button>
 
@@ -107,12 +108,12 @@
       </div>
     </div>
 
-    <!-- Footer (v0.6.7 version) -->
+    <!-- Footer -->
     <div class="mt-8 text-[10px] text-black dark:text-slate-600 uppercase tracking-widest font-black flex flex-col items-center gap-1.5">
       <div class="flex items-center">
-        <a href="https://github.com/viniciusdocanto/planningpoker" target="_blank" class="hover:text-indigo-800 dark:hover:text-indigo-400 transition-colors">Open Source</a>
+        <a href="https://github.com/viniciusdocanto/planningpoker" target="_blank" class="hover:text-indigo-800 dark:hover:text-indigo-400 transition-colors">{{ $t('common.openSource') }}</a>
         <span class="mx-2 opacity-50">|</span>
-        <a href="https://docanto.net" target="_blank" class="hover:text-fuchsia-800 dark:hover:text-fuchsia-400 transition-colors font-black underline decoration-fuchsia-500/30 underline-offset-4">Vinicius do Canto</a>
+        <a href="https://docanto.net" target="_blank" class="hover:text-fuchsia-800 dark:hover:text-fuchsia-400 transition-colors font-black underline decoration-fuchsia-500/30 underline-offset-4">{{ $t('common.by') }}</a>
       </div>
       <span class="opacity-30 tracking-normal normal-case font-mono text-[8px]">v{{ appVersion }}</span>
     </div>
@@ -124,9 +125,12 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import ThemeToggle from '../components/ThemeToggle.vue'
+import LanguageSelector from '../components/LanguageSelector.vue'
 import type { DeckType } from '../types/poker'
 import { DECK_LABELS } from '../types/poker'
+import { useI18n } from 'vue-i18n'
 
+const { t: $t } = useI18n()
 const router = useRouter()
 const route = useRoute()
 const userName = ref<string>('')

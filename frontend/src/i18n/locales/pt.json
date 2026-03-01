@@ -1,0 +1,58 @@
+{
+    "home": {
+        "title": "Planning Poker",
+        "tagline": "Estime tarefas com seu time em tempo real, de forma simples e divertida.",
+        "joinOrCreate": "Entrar ou criar sala",
+        "enteringRoom": "Entrando na sala",
+        "yourName": "Seu nome",
+        "namePlaceholder": "Como devemos te chamar?",
+        "roomId": "ID da sala",
+        "optional": "(opcional)",
+        "roomPlaceholder": "Deixe em branco para criar uma nova",
+        "deckType": "Tipo de baralho",
+        "joinRoom": "🚀 Entrar na sala",
+        "createRoom": "✨ Criar nova sala",
+        "invalidName": "Nome inválido. Use apenas letras (incluindo acentos), números, espaços, hífens ou pontos (máx. 30 chars).",
+        "invalidRoom": "ID de sala inválido. Use apenas letras, números, hífens ou underscores (máx. 40 chars)."
+    },
+    "room": {
+        "share": "Compartilhar",
+        "copied": "Copiado!",
+        "host": "Host",
+        "history": "Histórico",
+        "historyTitle": "Histórico de rodadas",
+        "noAverage": "Sem média",
+        "round": "Rodada",
+        "average": "Média",
+        "cancelTimer": "❌ Cancelar timer",
+        "reveal": "Revelar",
+        "reset": "Resetar",
+        "leave": "Sair",
+        "waitingPlayers": "Aguardando jogadores...",
+        "inviteHint": "Compartilhe o link para convidar o time!",
+        "you": "Você",
+        "voted": "Votou",
+        "thinking": "pensando...",
+        "didntVote": "não votou",
+        "noVotes": "Sem votos",
+        "votesCount": "{count}/{total} votaram",
+        "waitingHost": "Aguardando {host} revelar as cartas.",
+        "results": "📊 Resultados",
+        "roundEnded": "Rodada encerrada. Clique em Resetar no topo para recomeçar.",
+        "connected": "Conectado à sala!",
+        "userJoined": "{user} entrou na sala",
+        "userLeft": "{user} saiu da sala",
+        "deckChanged": "Baralho alterado para {deck}",
+        "seconds": "segundos"
+    },
+    "decks": {
+        "fibonacci": "Fibonacci",
+        "fibonacci_long": "Fibonacci (0-100)",
+        "powers_of_2": "Potências de 2",
+        "tshirt": "T-Shirt"
+    },
+    "common": {
+        "openSource": "Open Source",
+        "by": "Vinicius do Canto"
+    }
+}

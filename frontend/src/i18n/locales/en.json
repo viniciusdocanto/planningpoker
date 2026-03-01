@@ -1,0 +1,58 @@
+{
+    "home": {
+        "title": "Planning Poker",
+        "tagline": "Estimate tasks with your team in real time, simply and fun.",
+        "joinOrCreate": "Join or create room",
+        "enteringRoom": "Entering room",
+        "yourName": "Your name",
+        "namePlaceholder": "What should we call you?",
+        "roomId": "Room ID",
+        "optional": "(optional)",
+        "roomPlaceholder": "Leave blank to create a new one",
+        "deckType": "Deck type",
+        "joinRoom": "🚀 Join room",
+        "createRoom": "✨ Create new room",
+        "invalidName": "Invalid name. Use only letters, numbers, spaces, hyphens, or dots (max 30 chars).",
+        "invalidRoom": "Invalid room ID. Use only letters, numbers, hyphens, or underscores (max 40 chars)."
+    },
+    "room": {
+        "share": "Share",
+        "copied": "Copied!",
+        "host": "Host",
+        "history": "History",
+        "historyTitle": "Round history",
+        "noAverage": "No average",
+        "round": "Round",
+        "average": "Average",
+        "cancelTimer": "❌ Cancel timer",
+        "reveal": "Reveal",
+        "reset": "Reset",
+        "leave": "Leave",
+        "waitingPlayers": "Waiting for players...",
+        "inviteHint": "Share the link to invite the team!",
+        "you": "You",
+        "voted": "Voted",
+        "thinking": "thinking...",
+        "didntVote": "didn't vote",
+        "noVotes": "No votes",
+        "votesCount": "{count}/{total} voted",
+        "waitingHost": "Waiting for {host} to reveal the cards.",
+        "results": "📊 Results",
+        "roundEnded": "Round ended. Click Reset at the top to restart.",
+        "connected": "Connected to the room!",
+        "userJoined": "{user} joined the room",
+        "userLeft": "{user} left the room",
+        "deckChanged": "Deck changed to {deck}",
+        "seconds": "seconds"
+    },
+    "decks": {
+        "fibonacci": "Fibonacci",
+        "fibonacci_long": "Fibonacci (0-100)",
+        "powers_of_2": "Powers of 2",
+        "tshirt": "T-Shirt"
+    },
+    "common": {
+        "openSource": "Open Source",
+        "by": "Vinicius do Canto"
+    }
+}
