@@ -61,6 +61,22 @@ async def startup_event():
     logger.info("📡 Planning Poker API started. Inactivity cleanup task enabled.")
 
 # --- CORS: reads from env var ALLOWED_ORIGINS (comma-separated) ---
+# Example: ALLOWED_ORIGINS=https://seusite.com.br,https://www.seusite.com.br
+_raw_origins = os.getenv("ALLOWED_ORIGINS", "")
+allowed_origins = [o.strip() for o in _raw_origins.split(",") if o.strip()]
+
+if not allowed_origins:
+    logger.warning("⚠️ ALLOWED_ORIGINS is empty. The API will be inaccessible from browsers (CORS block).")
+elif "*" in allowed_origins:
+    logger.critical("🚨 SECURITY RISK: ALLOWED_ORIGINS contains '*'. This is extremely insecure for production!")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 def validate_room_id(room_id: str) -> bool:
