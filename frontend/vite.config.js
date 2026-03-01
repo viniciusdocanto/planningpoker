@@ -6,8 +6,11 @@ import pkg from './package.json'
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
+  // Garantir que o base seja sempre absoluto e termine com barra para evitar erros de resolução
+  const base = env.VITE_APP_BASE || '/planningpoker/'
+
   return {
-    base: env.VITE_APP_BASE || '/',
+    base: base.startsWith('/') ? base : `/${base}`,
     plugins: [
       vue(),
       tailwindcss(),

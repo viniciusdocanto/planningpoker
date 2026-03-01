@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.10.2] - 2026-02-28
+### Fixed
+- **Correção Crítica de Caminhos (v0.10.2):** Mudança para caminhos absolutos forçados no build para evitar tela branca em sub-rotas (ex: `/room/[id]`).
+- **Resiliência:** O `base` padrão agora é `/planningpoker/`, corrigindo falhas mesmo em builds sem `.env` configurado corretamente.
+
 ## [0.10.1] - 2026-02-28
 ### Fixed
 - **Correção de Produção Dinâmica:** Implementado suporte a `VITE_APP_BASE` para permitir a instalação do app em sub-diretórios (ex: Hostinger subfolders).
