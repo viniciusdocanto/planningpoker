@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.10.4] - 2026-02-28
+### Added
+- **CI/CD Secrets:** Adicionado suporte à variável `VITE_APP_BASE` no GitHub Actions via Secrets do repositório.
+
 ## [0.10.3] - 2026-02-28
 ### Changed
 - **Ambiente Dinâmico:** Removido o path `/planningpoker/` hardcoded no build. Agora o sistema respeita puramente o que estiver no `.env`.

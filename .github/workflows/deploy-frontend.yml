@@ -32,6 +32,7 @@ jobs:
         working-directory: frontend
         env:
           VITE_WS_URL: ${{ secrets.VITE_WS_URL }}
+          VITE_APP_BASE: ${{ secrets.VITE_APP_BASE }}
         run: npm run build
 
       - name: 🔧 Normalizar diretório FTP
