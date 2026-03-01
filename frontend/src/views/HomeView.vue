@@ -187,10 +187,9 @@ const handleAction = () => {
   // Persist name
   localStorage.setItem('poker-player-name', name)
   sessionStorage.setItem('playerName', name)
-  
-  // Pass deck only when creating a new room (not joining via link or custom room)
-  const query = (!isJoiningViaLink.value && !customRoom) ? { deck: deckType.value } : {}
-  router.push({ path: `/room/${targetRoom}`, query })
+  // Store deck choice in sessionStorage — keeps the URL clean
+  sessionStorage.setItem('poker-deck', deckType.value)
+  router.push(`/room/${targetRoom}`)
 }
 const appVersion: string = __APP_VERSION__
 </script>

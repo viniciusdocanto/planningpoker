@@ -317,7 +317,7 @@ if (!userName.value) {
 const appVersion: string = __APP_VERSION__
 const { addToast } = useToast()
 
-const gameState = ref<GameState>({ users: {}, revealed: false, host: null, deck_type: (route.query.deck as DeckType) || 'fibonacci', round_number: 0, history: [] })
+const gameState = ref<GameState>({ users: {}, revealed: false, host: null, deck_type: (sessionStorage.getItem('poker-deck') as DeckType) || 'fibonacci', round_number: 0, history: [] })
 const myVote = ref<CardValue | null>(null)
 const copied = ref<boolean>(false)
 const wsStatus = ref<WsStatus>('connecting')
@@ -364,7 +364,7 @@ const WS_BASE: string = rawWsUrl.replace(/^http/, 'ws')
 
 const connect = (): void => {
   if (!userName.value) { router.push('/'); return }
-  const deckParam = (route.query.deck as string) || 'fibonacci'
+  const deckParam = sessionStorage.getItem('poker-deck') || 'fibonacci'
   ws = new WebSocket(`${WS_BASE}/ws/${roomId.value}/${encodeURIComponent(userName.value)}?deck=${encodeURIComponent(deckParam)}`)
   ws.onopen = () => {
     console.log('🔌 WebSocket: Conectado com sucesso!')
