@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.10.3] - 2026-02-28
+### Changed
+- **Ambiente Dinâmico:** Removido o path `/planningpoker/` hardcoded no build. Agora o sistema respeita puramente o que estiver no `.env`.
+- **Simplificação:** O `base` do Vite agora volta a ser `/` por padrão, tornando o app agnóstico ao diretório de instalação por padrão.
+
 ## [0.10.2] - 2026-02-28
 ### Fixed
 - **Correção Crítica de Caminhos (v0.10.2):** Mudança para caminhos absolutos forçados no build para evitar tela branca em sub-rotas (ex: `/room/[id]`).
