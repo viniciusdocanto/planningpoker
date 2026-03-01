@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen pb-36 px-4 pt-4 relative">
-
+    <ToastContainer />
     <!-- Header -->
     <header class="glass rounded-2xl px-5 py-4 mb-6 flex justify-between items-center max-w-5xl mx-auto border-white/10 dark:border-white/5">
       <!-- Left: Room info -->
@@ -239,8 +239,10 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ThemeToggle from '../components/ThemeToggle.vue'
-import type { GameState, WsInMessage, WsStatus, CardValue } from '../types/poker'
+import ToastContainer from '../components/ToastContainer.vue'
+import type { GameState, WsServerMessage, WsStatus, CardValue } from '../types/poker'
 import { DECK } from '../types/poker'
+import { useToast } from '../composables/useToast'
 
 const route = useRoute()
 const router = useRouter()
@@ -256,6 +258,7 @@ if (!userName.value) {
 
 const appVersion: string = __APP_VERSION__
 const deck: readonly string[] = DECK
+const { addToast } = useToast()
 
 const gameState = ref<GameState>({ users: {}, revealed: false, host: null })
 const myVote = ref<CardValue | null>(null)
@@ -288,14 +291,23 @@ const connect = (): void => {
     console.log('🔌 WebSocket: Conectado com sucesso!')
     wsStatus.value = 'connected'
     if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null }
+    addToast('Conectado à sala!', 'success')
   }
   ws.onmessage = (e: MessageEvent<string>) => {
     try {
-      const msg = JSON.parse(e.data) as WsInMessage
+      const msg = JSON.parse(e.data) as WsServerMessage
       if (msg.type === 'state_update') {
         gameState.value = msg.data
         const me = gameState.value.users[userName.value]
         if (me && !me.voted) myVote.value = null
+      } else if (msg.type === 'event_notify') {
+        if (msg.user !== userName.value) {
+          if (msg.event === 'user_joined') {
+            addToast(`${msg.user} entrou na sala`, 'info')
+          } else if (msg.event === 'user_left') {
+            addToast(`${msg.user} saiu da sala`, 'warning')
+          }
+        }
       }
     } catch (err) {
       console.warn('Received invalid message from server:', err)
@@ -305,6 +317,9 @@ const connect = (): void => {
     console.warn(`🔌 WebSocket: Conexão fechada (Código: ${event.code}). Tentando reconectar em 3s...`)
     wsStatus.value = 'reconnecting'
     reconnectTimer = setTimeout(connect, 3000)
+    if (event.code !== 1000 && event.code !== 1001) {
+      addToast('Conexão perdida. Reconectando...', 'error', 3000)
+    }
   }
   ws.onerror = (err: Event) => {
     console.error('🔌 WebSocket: Erro detectado na conexão:', err)

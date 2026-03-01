@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.13.0] - 2026-03-01
+### Added
+- **Sistema de Toasts:** Notificações flutuantes (canto inferior direito) com animação slide-in/out, glassmorphism e auto-dismiss.
+- **Eventos de sala:** Backend emite `user_joined` e `user_left` via WebSocket; frontend exibe toast de info/warning ao entrar/sair.
+- **Toasts de conexão:** Toast de sucesso ao conectar e de erro ao perder a conexão (códigos != 1000/1001).
+- **Composable `useToast`:** Está global e reutilizável em qualquer componente futuro.
+
 ## [0.12.0] - 2026-03-01
 ### Added
 - **Migração TypeScript:** Frontend migrado de JavaScript puro para TypeScript com `strict: true`. Todos os componentes Vue 3 agora usam `<script setup lang="ts">`.

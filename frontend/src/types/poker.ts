@@ -19,11 +19,21 @@ export interface WsOutMessage {
     value?: string
 }
 
+/** Event notification sent by the server (user joined/left) */
+export interface WsEventMessage {
+    type: 'event_notify'
+    event: 'user_joined' | 'user_left'
+    user: string
+}
+
 /** Incoming WebSocket message wrapper */
 export interface WsInMessage {
     type: 'state_update'
     data: GameState
 }
+
+/** All possible incoming WebSocket messages */
+export type WsServerMessage = WsInMessage | WsEventMessage
 
 /** WebSocket connection status */
 export type WsStatus = 'connecting' | 'connected' | 'reconnecting'

@@ -273,6 +273,7 @@ class ConnectionManager:
         await store.set(room_id, state)
 
         self.active_connections[room_id].append(websocket)
+        await self.broadcast_event(room_id, 'user_joined', user_name, exclude=websocket)
         await self.broadcast_state(room_id)
         return True
 
@@ -302,7 +303,18 @@ class ConnectionManager:
         if websocket in self.rate_limits:
             del self.rate_limits[websocket]
 
-    async def broadcast_state(self, room_id: str):
+    async def broadcast_event(self, room_id: str, event: str, user: str, exclude: Optional[WebSocket] = None) -> None:
+        """Send event_notify to all connections in room (optionally excluding one WS)."""
+        payload = {"type": "event_notify", "event": event, "user": user}
+        for conn in self.active_connections.get(room_id, []):
+            if conn is exclude:
+                continue
+            try:
+                await conn.send_json(payload)
+            except Exception:
+                pass
+
+    async def broadcast_state(self, room_id: str) -> None:
         if room_id not in self.active_connections:
             return
         state = await store.get(room_id)
