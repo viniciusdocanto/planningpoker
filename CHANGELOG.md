@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.17.0] - 2026-03-01
+### Added
+- **Feedback Sensorial:** Implementado feedback háptico (vibração de 40ms) ao votar e feedback sonoro (sons de clique e revelação) via Web Audio API.
+- **Robustez:** Adicionados null-checks defensivos e tratamento de mensagens malformadas no frontend para prevenir o erro de "tela branca" em produção.
+
 ## [0.16.1] - 2026-03-01
 ### Fixed
 - **Auto-Reveal:** Agora o sistema revela os votos automaticamente assim que o temporizador chega a zero, garantindo o fluxo da reunião mesmo se o host se distrair.

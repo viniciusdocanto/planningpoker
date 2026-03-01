@@ -73,7 +73,7 @@
               </div>
               <div class="max-h-80 overflow-y-auto p-3 flex flex-col gap-3">
                 <div
-                  v-for="entry in [...gameState.history].reverse()"
+                  v-for="entry in [...(gameState.history || [])].reverse()"
                   :key="entry.round"
                   class="rounded-xl border border-slate-200 dark:border-white/10 bg-white/50 dark:bg-white/5 p-3"
                 >
@@ -88,7 +88,7 @@
                   </div>
                   <div class="flex flex-wrap gap-1.5">
                     <div
-                      v-for="(vote, user) in entry.votes"
+                      v-for="(vote, user) in (entry.votes || {})"
                       :key="user"
                       class="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10"
                     >
@@ -179,7 +179,7 @@
         <!-- Players arranged above and below the table oval -->
         <div class="w-full flex flex-wrap justify-center gap-8 mb-10 pt-10">
           <div
-            v-for="(data, user) in gameState.users"
+            v-for="(data, user) in (gameState.users || {})"
             :key="user"
             class="flex flex-col items-center gap-3"
           >
@@ -264,7 +264,7 @@
         <h2 class="text-sm font-black text-black dark:text-slate-300 uppercase tracking-widest mb-4">📊 Resultados</h2>
         <div class="flex flex-wrap gap-2">
           <div
-            v-for="(data, user) in gameState.users"
+            v-for="(data, user) in (gameState.users || {})"
             :key="user"
             class="flex items-center gap-2 bg-slate-950/5 dark:bg-white/5 rounded-xl px-4 py-2.5 border border-slate-400 dark:border-white/[0.06]"
           >
@@ -343,6 +343,7 @@ import ToastContainer from '../components/ToastContainer.vue'
 import type { GameState, WsServerMessage, WsStatus, CardValue, DeckType } from '../types/poker'
 import { DECKS, DECK_LABELS } from '../types/poker'
 import { useToast } from '../composables/useToast'
+import { useFeedback } from '../composables/useFeedback'
 
 const route = useRoute()
 const router = useRouter()
@@ -358,6 +359,7 @@ if (!userName.value) {
 
 const appVersion: string = __APP_VERSION__
 const { addToast } = useToast()
+const { vibrate, playRevealSound, playClickSound } = useFeedback()
 
 const gameState = ref<GameState>({ users: {}, revealed: false, host: null, deck_type: (sessionStorage.getItem('poker-deck') as DeckType) || 'fibonacci', round_number: 0, history: [], timer_end: null, timer_duration: 60 })
 const myVote = ref<CardValue | null>(null)
@@ -376,7 +378,7 @@ const timeLeft = ref<number | null>(null)
 let timerInterval: ReturnType<typeof setInterval> | null = null
 
 const timerProgress = computed<number>(() => {
-  if (timeLeft.value === null || gameState.value.timer_duration <= 0) return 1
+  if (timeLeft.value === null || !gameState.value?.timer_duration || gameState.value.timer_duration <= 0) return 1
   return Math.max(0, timeLeft.value / gameState.value.timer_duration)
 })
 
@@ -432,7 +434,7 @@ const toggleHistory = (): void => {
 }
 
 const voteAverage = computed<number | string | null>(() => {
-  if (!gameState.value.revealed) return null
+  if (!gameState.value?.revealed || !gameState.value?.users) return null
   const nums = Object.values(gameState.value.users)
     .filter(d => d.voted && d.vote != null && !isNaN(parseFloat(d.vote)))
     .map(d => parseFloat(d.vote!))
@@ -458,9 +460,20 @@ const connect = (): void => {
   ws.onmessage = (e: MessageEvent<string>) => {
     try {
       const msg = JSON.parse(e.data) as WsServerMessage
-      if (msg.type === 'state_update') {
+      if (msg.type === 'state_update' && msg.data) {
+        const wasRevealed = gameState.value?.revealed ?? false
         gameState.value = msg.data
-        const me = gameState.value.users[userName.value]
+        
+        // Safety: Ensure history and users are always defined to prevent template crashes
+        if (!gameState.value.history) gameState.value.history = []
+        if (!gameState.value.users) gameState.value.users = {}
+
+        // Play reveal sound only once when state changes to revealed
+        if (gameState.value.revealed && !wasRevealed) {
+          playRevealSound()
+        }
+        
+        const me = (gameState.value.users as any)[userName.value]
         if (me && !me.voted) myVote.value = null
       } else if (msg.type === 'event_notify') {
         if (msg.event === 'user_joined' && msg.user !== userName.value) {
@@ -508,6 +521,10 @@ const copyInviteLink = async (): Promise<void> => {
 }
 
 const selectCard = (card: string): void => {
+  if (myVote.value !== card) {
+    vibrate(40)
+    playClickSound()
+  }
   myVote.value = card as CardValue
   if (ws?.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ action: 'vote', value: card }))
 }

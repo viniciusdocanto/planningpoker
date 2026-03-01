@@ -2,7 +2,7 @@
 
 > Estime tarefas com seu time em tempo real, sem recarregar a página.
 
-[![version](https://img.shields.io/badge/version-0.16.1-indigo.svg)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-0.17.0-indigo.svg)](CHANGELOG.md)
 [![license](https://img.shields.io/badge/license-MIT-purple.svg)](LICENSE)
 
 ## Tecnologias
@@ -56,6 +56,8 @@ Acesse em: **http://localhost:5173**
 - 💾 **Persistência** — estado das salas sobrevive a reinicializações (Redis)
 - 🎨 **Design premium** — glassmorphism, gradientes, tema claro/escuro
 - 🔒 **Segurança** — validação server + client, CORS, whitelist de votos, limite de sala
+- 🔊 **Feedback Sensorial** — sons sutis ao revelar cartas e vibração (mobile) ao votar
+- 🛡️ **Robustez** — tratamento de erros defensivos para evitar falhas de interface em produção
 
 ## Estrutura
 

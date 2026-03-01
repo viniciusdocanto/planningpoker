@@ -46,7 +46,7 @@ RATE_LIMIT_WINDOW = 1.0     # window size in seconds
 # Pydantic Models
 # ---------------------------------------------------------------------------
 
-APP_VERSION = "0.12.0"
+APP_VERSION = "0.17.0"
 
 
 class UserState(BaseModel):
