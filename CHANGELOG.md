@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.11.0] - 2026-03-01
+### Added
+- **Persistência com Redis:** Estado das salas (usuários, votos, host) agora é armazenado no Redis com TTL de 2h, sobrevivendo a reinicializações do servidor.
+- **Fallback em memória:** Quando `REDIS_URL` não está configurada, o sistema funciona identicamente ao comportamento anterior (zero breaking change).
+- **GC adaptativo:** O Garbage Collector detecta automaticamente se está usando Redis (delega ao TTL) ou memória (varre manualmente).
+
 ## [0.10.5] - 2026-03-01
 ### Improved
 - **Resiliência de Rede:** Adicionados logs de diagnóstico detalhados para o WebSocket no console do navegador, facilitando a identificação de problemas de cold-start ou CORS.

@@ -7,4 +7,14 @@ services:
     envVars:
       - key: ALLOWED_ORIGINS
         sync: false   # preencha no dashboard do Render com a URL do seu site
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: planning-poker-redis
+          property: connectionString
     healthCheckPath: /
+
+databases:
+  - type: redis
+    name: planning-poker-redis
+    ipAllowList: []   # only accessible internally by the web service
