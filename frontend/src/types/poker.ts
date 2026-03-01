@@ -11,6 +11,7 @@ export interface GameState {
     users: Record<string, UserData>
     revealed: boolean
     host: string | null
+    deck_type: DeckType
 }
 
 /** Outgoing WebSocket message shape */
@@ -19,11 +20,12 @@ export interface WsOutMessage {
     value?: string
 }
 
-/** Event notification sent by the server (user joined/left) */
+/** Event notification sent by the server (user joined/left or deck changed) */
 export interface WsEventMessage {
     type: 'event_notify'
-    event: 'user_joined' | 'user_left'
+    event: 'user_joined' | 'user_left' | 'deck_changed'
     user: string
+    deck_type?: DeckType
 }
 
 /** Incoming WebSocket message wrapper */
@@ -38,6 +40,21 @@ export type WsServerMessage = WsInMessage | WsEventMessage
 /** WebSocket connection status */
 export type WsStatus = 'connecting' | 'connected' | 'reconnecting'
 
+/** Supported deck types */
+export type DeckType = 'fibonacci' | 'powers2' | 'tshirt'
+
+export const DECKS: Record<DeckType, readonly string[]> = {
+    fibonacci: ['0', '½', '1', '2', '3', '5', '8', '13', '21', '34', '55', '89', '?', '☕'],
+    powers2: ['0', '1', '2', '4', '8', '16', '32', '64', '?', '☕'],
+    tshirt: ['XS', 'S', 'M', 'L', 'XL', 'XXL', '?', '☕'],
+} as const
+
+export const DECK_LABELS: Record<DeckType, string> = {
+    fibonacci: 'Fibonacci',
+    powers2: 'Potências de 2',
+    tshirt: 'T-Shirt Sizes',
+}
+
 /** Valid Fibonacci/special card values */
-export const DECK = ['0', '½', '1', '2', '3', '5', '8', '13', '21', '34', '55', '89', '?', '☕'] as const
-export type CardValue = (typeof DECK)[number]
+export const DECK = DECKS.fibonacci
+export type CardValue = string

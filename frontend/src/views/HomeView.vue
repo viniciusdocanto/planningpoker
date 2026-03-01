@@ -67,6 +67,25 @@
           >
         </div>
 
+        <!-- Deck type selector (only when creating a new room) -->
+        <div v-if="!isJoiningViaLink && !roomId.trim()">
+          <label class="block text-xs font-black text-black dark:text-slate-400 uppercase tracking-wider mb-2">Tipo de baralho</label>
+          <div class="flex gap-2">
+            <button
+              v-for="(label, type) in DECK_LABELS"
+              :key="type"
+              type="button"
+              @click="deckType = type as DeckType"
+              :class="[
+                'flex-1 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 border',
+                deckType === type
+                  ? 'bg-indigo-600 border-indigo-500 text-white shadow-md shadow-indigo-500/30'
+                  : 'bg-slate-950/5 dark:bg-white/5 border-slate-500 dark:border-white/10 text-black dark:text-slate-300 hover:border-indigo-400'
+              ]"
+            >{{ label }}</button>
+          </div>
+        </div>
+
         <!-- Action Button (v0.6.7 fix: text-white for visibility) -->
         <button
           @click="handleAction"
@@ -105,11 +124,14 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import ThemeToggle from '../components/ThemeToggle.vue'
+import type { DeckType } from '../types/poker'
+import { DECK_LABELS } from '../types/poker'
 
 const router = useRouter()
 const route = useRoute()
 const userName = ref<string>('')
 const roomId = ref<string>('')
+const deckType = ref<DeckType>('fibonacci')
 const isJoiningViaLink = ref<boolean>(false)
 const errorMsg = ref<string>('')
 
@@ -166,7 +188,9 @@ const handleAction = () => {
   localStorage.setItem('poker-player-name', name)
   sessionStorage.setItem('playerName', name)
   
-  router.push(`/room/${targetRoom}`)
+  // Pass deck only when creating a new room (not joining via link or custom room)
+  const query = (!isJoiningViaLink.value && !customRoom) ? { deck: deckType.value } : {}
+  router.push({ path: `/room/${targetRoom}`, query })
 }
 const appVersion: string = __APP_VERSION__
 </script>

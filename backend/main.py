@@ -21,11 +21,16 @@ INACTIVE_TIMEOUT  = 2 * 60 * 60  # 2 hours of inactivity
 REDIS_TTL         = INACTIVE_TIMEOUT  # Redis key TTL mirrors the GC timeout
 MAX_ROOM_ID_LEN   = 40
 MAX_USERNAME_LEN  = 30
-MAX_VOTE_LEN      = 4      # longest valid card is "☕" (4 bytes)
+MAX_VOTE_LEN      = 8      # longest valid card is "XXL" + slack
 MAX_USERS_PER_ROOM = 20
 VALID_NAME_RE     = re.compile(r'^[a-zA-ZÀ-ÿ0-9\s\-\.]{1,30}$', re.UNICODE)
 VALID_ROOM_RE     = re.compile(r'^[A-Za-z0-9\-_]{1,40}$')
-ALLOWED_VOTES     = {'0', '½', '1', '2', '3', '5', '8', '13', '21', '34', '55', '89', '?', '☕'}
+DECK_TYPES: Dict[str, List[str]] = {
+    'fibonacci': ['0', '½', '1', '2', '3', '5', '8', '13', '21', '34', '55', '89', '?', '☕'],
+    'powers2':   ['0', '1', '2', '4', '8', '16', '32', '64', '?', '☕'],
+    'tshirt':    ['XS', 'S', 'M', 'L', 'XL', 'XXL', '?', '☕'],
+}
+ALLOWED_VOTES = set(v for deck in DECK_TYPES.values() for v in deck)  # union of all cards
 RATE_LIMIT_MSGS   = 10      # max messages per window
 RATE_LIMIT_WINDOW = 1.0     # window size in seconds
 
@@ -46,6 +51,7 @@ class RoomState(BaseModel):
     revealed: bool = False
     host: Optional[str] = None
     last_activity: float = 0.0
+    deck_type: str = 'fibonacci'
 
     def model_dump_json_safe(self) -> dict:
         """Returns a plain dict safe for JSON serialisation."""
@@ -59,7 +65,7 @@ class WsMessage(BaseModel):
     @field_validator('action')
     @classmethod
     def action_must_be_known(cls, v: str) -> str:
-        if v not in ('vote', 'reveal', 'reset'):
+        if v not in ('vote', 'reveal', 'reset', 'set_deck'):
             raise ValueError(f'Unknown action: {v}')
         return v
 
@@ -233,7 +239,7 @@ class ConnectionManager:
         self.active_connections: Dict[str, List[WebSocket]] = {}
         self.rate_limits: Dict[int, Dict[str, object]] = {}  # keyed by id(ws)
 
-    async def connect(self, websocket: WebSocket, room_id: str, user_name: str) -> bool:
+    async def connect(self, websocket: WebSocket, room_id: str, user_name: str, deck_type: str = 'fibonacci') -> bool:
         if not validate_room_id(room_id) or not validate_username(user_name):
             await websocket.close(code=status.WS_1008_POLICY_VIOLATION,
                                   reason="Invalid room_id or user_name.")
@@ -257,12 +263,13 @@ class ConnectionManager:
         await websocket.accept()
 
         if state is None:
-            # Brand new room
+            # Brand new room — use the deck_type requested by the creator
             state = RoomState(
                 users={},
                 revealed=False,
                 host=user_name,
                 last_activity=time.time(),
+                deck_type=deck_type,
             )
 
         if room_id not in self.active_connections:
@@ -303,9 +310,11 @@ class ConnectionManager:
         if websocket in self.rate_limits:
             del self.rate_limits[websocket]
 
-    async def broadcast_event(self, room_id: str, event: str, user: str, exclude: Optional[WebSocket] = None) -> None:
+    async def broadcast_event(self, room_id: str, event: str, user: str, exclude: Optional[WebSocket] = None, deck_type: Optional[str] = None) -> None:
         """Send event_notify to all connections in room (optionally excluding one WS)."""
-        payload = {"type": "event_notify", "event": event, "user": user}
+        payload: Dict[str, object] = {"type": "event_notify", "event": event, "user": user}
+        if deck_type is not None:
+            payload['deck_type'] = deck_type
         for conn in self.active_connections.get(room_id, []):
             if conn is exclude:
                 continue
@@ -324,7 +333,8 @@ class ConnectionManager:
         state_to_send: Dict[str, object] = {
             'users': {},
             'revealed': state.revealed,
-            'host': state.host
+            'host': state.host,
+            'deck_type': state.deck_type,
         }
         for user, data in state.users.items():
             if state.revealed:
@@ -376,6 +386,22 @@ class ConnectionManager:
             await store.set(room_id, state)
             await self.broadcast_state(room_id)
 
+    async def set_deck_type(self, room_id: str, deck: str) -> None:
+        if deck not in DECK_TYPES:
+            return
+        state = await store.get(room_id)
+        if state:
+            state.deck_type = deck
+            state.revealed = False
+            state.last_activity = time.time()
+            for user in state.users.values():
+                user.vote = None
+                user.voted = False
+            await store.set(room_id, state)
+            host_name = state.host or ''
+            await self.broadcast_event(room_id, 'deck_changed', host_name, deck_type=deck)
+            await self.broadcast_state(room_id)
+
     def is_rate_limited(self, websocket: WebSocket) -> bool:
         now = time.time()
         if websocket not in self.rate_limits:
@@ -405,8 +431,8 @@ manager = ConnectionManager()
 # ---------------------------------------------------------------------------
 
 @app.websocket("/ws/{room_id}/{user_name}")
-async def websocket_endpoint(websocket: WebSocket, room_id: str, user_name: str):
-    accepted = await manager.connect(websocket, room_id, user_name)
+async def websocket_endpoint(websocket: WebSocket, room_id: str, user_name: str, deck: str = 'fibonacci'):
+    accepted = await manager.connect(websocket, room_id, user_name, deck_type=deck if deck in DECK_TYPES else 'fibonacci')
     if not accepted:
         return
 
@@ -432,6 +458,11 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str, user_name: str)
             elif action == 'reset':
                 if await manager.get_host(room_id) == user_name:
                     await manager.reset_votes(room_id)
+
+            elif action == 'set_deck':
+                if await manager.get_host(room_id) == user_name:
+                    deck = str(data.get('value', ''))[:16]
+                    await manager.set_deck_type(room_id, deck)
 
     except WebSocketDisconnect:
         pass

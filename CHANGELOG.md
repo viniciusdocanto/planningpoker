@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.14.0] - 2026-03-01
+### Added
+- **Baralhos Customizáveis:** Host pode escolher entre Fibonacci, Potências de 2 e T-Shirt Sizes. A troca sincroniza o deck para todos, reseta votos e exibe um toast.
+- **Backend:** Novo campo `deck_type` em `RoomState`, action `set_deck`, constante `DECK_TYPES` com validação de cartas por baralho.
+- **Frontend:** Deck computado dinamicamente de `gameState.deck_type`, seletor de baralho host-only acima das cartas.
+
 ## [0.13.0] - 2026-03-01
 ### Added
 - **Sistema de Toasts:** Notificações flutuantes (canto inferior direito) com animação slide-in/out, glassmorphism e auto-dismiss.

@@ -240,8 +240,8 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ThemeToggle from '../components/ThemeToggle.vue'
 import ToastContainer from '../components/ToastContainer.vue'
-import type { GameState, WsServerMessage, WsStatus, CardValue } from '../types/poker'
-import { DECK } from '../types/poker'
+import type { GameState, WsServerMessage, WsStatus, CardValue, DeckType } from '../types/poker'
+import { DECKS, DECK_LABELS } from '../types/poker'
 import { useToast } from '../composables/useToast'
 
 const route = useRoute()
@@ -257,16 +257,17 @@ if (!userName.value) {
 }
 
 const appVersion: string = __APP_VERSION__
-const deck: readonly string[] = DECK
 const { addToast } = useToast()
 
-const gameState = ref<GameState>({ users: {}, revealed: false, host: null })
+const gameState = ref<GameState>({ users: {}, revealed: false, host: null, deck_type: (route.query.deck as DeckType) || 'fibonacci' })
 const myVote = ref<CardValue | null>(null)
 const copied = ref<boolean>(false)
 const wsStatus = ref<WsStatus>('connecting')
 
 let ws: WebSocket | null = null
 let reconnectTimer: ReturnType<typeof setTimeout> | null = null
+
+const deck = computed<readonly string[]>(() => DECKS[gameState.value.deck_type] ?? DECKS.fibonacci)
 
 const isHost = computed<boolean>(() => gameState.value.host === userName.value)
 
@@ -286,7 +287,8 @@ const WS_BASE: string = rawWsUrl.replace(/^http/, 'ws')
 
 const connect = (): void => {
   if (!userName.value) { router.push('/'); return }
-  ws = new WebSocket(`${WS_BASE}/ws/${roomId.value}/${encodeURIComponent(userName.value)}`)
+  const deckParam = (route.query.deck as string) || 'fibonacci'
+  ws = new WebSocket(`${WS_BASE}/ws/${roomId.value}/${encodeURIComponent(userName.value)}?deck=${encodeURIComponent(deckParam)}`)
   ws.onopen = () => {
     console.log('🔌 WebSocket: Conectado com sucesso!')
     wsStatus.value = 'connected'
@@ -301,12 +303,13 @@ const connect = (): void => {
         const me = gameState.value.users[userName.value]
         if (me && !me.voted) myVote.value = null
       } else if (msg.type === 'event_notify') {
-        if (msg.user !== userName.value) {
-          if (msg.event === 'user_joined') {
-            addToast(`${msg.user} entrou na sala`, 'info')
-          } else if (msg.event === 'user_left') {
-            addToast(`${msg.user} saiu da sala`, 'warning')
-          }
+        if (msg.event === 'user_joined' && msg.user !== userName.value) {
+          addToast(`${msg.user} entrou na sala`, 'info')
+        } else if (msg.event === 'user_left' && msg.user !== userName.value) {
+          addToast(`${msg.user} saiu da sala`, 'warning')
+        } else if (msg.event === 'deck_changed') {
+          const label = msg.deck_type ? DECK_LABELS[msg.deck_type] : 'desconhecido'
+          addToast(`Baralho alterado para ${label}`, 'info')
         }
       }
     } catch (err) {
