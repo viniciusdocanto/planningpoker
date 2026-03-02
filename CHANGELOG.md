@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.19.0] - 2026-03-02
+### Added
+- **Componentização Cuidadosa do `RoomView`:** Extração completa de subcomponentes (`RoomHeader`, `PokerTable`, `ResultsPanel`, `VotingDeck`) a partir da versão restaurada, garantindo paridade visual absoluta.
+- **Manutenibilidade:** Lógica de orquestração no `RoomView` simplificada, com comunicação clara via eventos e props entre os novos componentes.
+- **Versionamento:** Sincronização de versão `0.19.0` entre frontend e backend.
+### Fixed
+- **Design:** Garantida a preservação da "Mesa Esmeralda" e de todos os detalhes premium durante a transição para componentes modulares.
+
+## [0.18.2] - 2026-03-01
+### Added
+- **Componente `PokerTable`:** Recuperado o visual de "mesa de poker" (design premium oval) que havia sido perdido na refatoração.
+- **Indicador de Progresso:** Reintroduzido o contador de votos em tempo real ("X/Y votaram") com barra de progresso animada no centro da mesa.
+### Changed
+- **Arquitetura:** Componente `PokerTable` agora orquestra o `PlayerGrid` e `ResultsPanel`, mantendo o `RoomView` limpo.
+
+## [0.18.1] - 2026-03-01
+### Changed
+- **Refatoração do Backend:** Monolito `main.py` decomposto em um pacote estruturado (`app/`) com separação de responsabilidades (constants, models, store, manager, utils).
+- **Componentização do Frontend:** `HomeView.vue` e `RoomView.vue` agora utilizam componentes atômicos (`HomeHeader`, `EntranceCard`, `RoomHeader`, `PlayerGrid`, etc.) para melhor manutenibilidade.
+### Fixed
+- **Correção E2E:** Restaurada a visibilidade do texto "Votou" e do indicador "(Você)" no `PlayerGrid` para garantir compatibilidade com a suíte de testes.
+
 ## [0.18.0] - 2026-03-01
 ### Added
 - **Internacionalização (I18n):** Suporte completo para Português, Inglês e Espanhol usando `vue-i18n`.

@@ -2,7 +2,7 @@
 
 > Estime tarefas com seu time em tempo real, sem recarregar a página.
 
-[![version](https://img.shields.io/badge/version-0.18.0-indigo.svg)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-0.19.0-indigo.svg)](CHANGELOG.md)
 [![license](https://img.shields.io/badge/license-MIT-purple.svg)](LICENSE)
 
 ## Tecnologias
@@ -28,6 +28,8 @@
 cd backend
 pip install -r requirements.txt
 python -m uvicorn main:app --reload --port 8000
+# Ou use o shim de entrada:
+python main.py
 ```
 
 ### 2. Frontend
