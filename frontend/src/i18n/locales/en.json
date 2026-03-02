@@ -13,7 +13,9 @@
         "joinRoom": "🚀 Join room",
         "createRoom": "✨ Create new room",
         "invalidName": "Invalid name. Use only letters, numbers, spaces, hyphens, or dots (max 30 chars).",
-        "invalidRoom": "Invalid room ID. Use only letters, numbers, hyphens, or underscores (max 40 chars)."
+        "invalidRoom": "Invalid room ID. Use only letters, numbers, hyphens, or underscores (max 40 chars).",
+        "beta": "BETA",
+        "renderWarning": "Note: The server may take up to 50 seconds to wake up on the first connection."
     },
     "room": {
         "share": "Share",

@@ -13,7 +13,9 @@
         "joinRoom": "🚀 Entrar na sala",
         "createRoom": "✨ Criar nova sala",
         "invalidName": "Nome inválido. Use apenas letras (incluindo acentos), números, espaços, hífens ou pontos (máx. 30 chars).",
-        "invalidRoom": "ID de sala inválido. Use apenas letras, números, hífens ou underscores (máx. 40 chars)."
+        "invalidRoom": "ID de sala inválido. Use apenas letras, números, hífens ou underscores (máx. 40 chars).",
+        "beta": "BETA",
+        "renderWarning": "Nota: O servidor pode levar até 50 segundos para acordar na primeira conexão."
     },
     "room": {
         "share": "Compartilhar",

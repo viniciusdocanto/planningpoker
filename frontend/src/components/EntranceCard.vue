@@ -87,6 +87,13 @@
 
       <!-- Error message -->
       <p v-if="props.errorMsg" class="text-rose-400 text-xs text-center mt-1 font-bold">⚠️ {{ props.errorMsg }}</p>
+
+      <!-- Render/Free Tier Warning -->
+      <div class="mt-4 p-3 rounded-xl bg-amber-500/5 border border-amber-500/10">
+        <p class="text-[10px] text-amber-700 dark:text-amber-500/80 leading-relaxed font-medium text-center">
+          <span class="font-black opacity-100">💡</span> {{ t('home.renderWarning') }}
+        </p>
+      </div>
     </div>
   </div>
 </template>
