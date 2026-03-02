@@ -9,7 +9,7 @@
         {{ $t('common.by') }}
       </a>
     </div>
-    <span class="opacity-30 tracking-normal normal-case font-mono text-[8px]">v{{ version }}</span>
+    <span class="font-bold text-orange-700 tracking-normal normal-case font-mono text-[10px]">v{{ version }}</span>
   </footer>
 </template>
 

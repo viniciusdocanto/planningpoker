@@ -25,7 +25,7 @@
               <span class="mx-2 opacity-50">|</span>
               <a href="https://docanto.net" target="_blank" class="hover:text-fuchsia-800 dark:hover:text-fuchsia-400 transition-colors font-black underline decoration-fuchsia-500/30 underline-offset-4">{{ $t('common.by') }}</a>
             </div>
-            <span class="opacity-30 tracking-normal normal-case font-mono text-[8px]">v{{ version }}</span>
+            <span class="font-bold text-orange-700 tracking-normal normal-case font-mono text-[10px]">v{{ version }}</span>
           </div>
         </footer>
       </div>
@@ -40,7 +40,7 @@
         <span class="mx-2 opacity-50">|</span>
         <a href="https://docanto.net" target="_blank" class="hover:text-fuchsia-800 dark:hover:text-fuchsia-400 transition-colors font-black underline decoration-fuchsia-500/30 underline-offset-4">{{ $t('common.by') }}</a>
       </div>
-      <span class="opacity-30 tracking-normal normal-case font-mono text-[8px]">v{{ version }}</span>
+      <span class="font-bold text-orange-700 tracking-normal normal-case font-mono text-[10px]">v{{ version }}</span>
     </div>
   </footer>
 </template>
