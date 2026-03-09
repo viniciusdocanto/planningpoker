@@ -100,17 +100,28 @@
       </div>
 
       <!-- Timer controls (host only, when not revealed) -->
-      <div v-if="isHost && !gameState.revealed" class="flex items-center gap-1.5">
-        <template v-if="gameState.timer_end === null">
-          <span class="text-[10px] text-slate-400 hidden sm:inline">⏱</span>
-          <button v-for="secs in [30, 60, 90]" :key="secs"
-            @click="$emit('start-timer', secs)"
-            class="px-2 py-1.5 rounded-lg text-[11px] font-black bg-slate-950/5 dark:bg-white/10 hover:bg-indigo-500 hover:text-white text-black dark:text-slate-300 border border-slate-300 dark:border-white/10 transition-all"
-          >{{ secs }}s</button>
+      <div v-if="isHost && !gameState.revealed" class="flex items-center gap-1.5 bg-slate-100 dark:bg-white/5 p-1 rounded-xl border border-slate-300 dark:border-white/10">
+        <button v-for="secs in [30, 60, 90]" :key="secs"
+          @click="$emit('start-timer', secs)"
+          class="px-2.5 py-1.5 rounded-lg text-[10px] sm:text-[11px] font-black transition-all"
+          :class="[
+            gameState.timer_end !== null && gameState.timer_duration === secs
+              ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30 active:scale-95'
+              : 'text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 active:scale-95'
+          ]"
+        >{{ secs }}s</button>
+        
+        <template v-if="gameState.timer_end !== null">
+          <div class="w-px h-4 bg-slate-300 dark:bg-white/10 mx-0.5"></div>
+          <button @click="$emit('cancel-timer')"
+            class="p-1.5 rounded-lg text-rose-500 hover:bg-rose-500 hover:text-white transition-all active:scale-90"
+            :title="$t('room.cancelTimer')"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </template>
-        <button v-else @click="$emit('cancel-timer')"
-          class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-black bg-rose-500/10 hover:bg-rose-500 hover:text-white text-rose-600 dark:text-rose-400 border border-rose-400/30 transition-all"
-        >{{ $t('room.cancelTimer') }}</button>
       </div>
 
       <button

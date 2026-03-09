@@ -87,7 +87,8 @@ const {
   handleAction,
   leaveRoom,
   startTimer,
-  cancelTimer
+  cancelTimer,
+  serverSkew
 } = useRoomWebSocket(roomId.value, userName.value)
 
 // --- Timer ---
@@ -103,8 +104,9 @@ const timerProgress = computed<number>(() => {
 const updateTimer = () => {
   const end = gameState.value?.timer_end
   if (end) {
-    const now = Date.now() / 1000
-    const diff = end - now
+    const nowLocal = Date.now() / 1000
+    const nowSynced = nowLocal + serverSkew.value
+    const diff = end - nowSynced
     if (diff > 0) {
       timeLeft.value = Math.ceil(diff)
     } else {

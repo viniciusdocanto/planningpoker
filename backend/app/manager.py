@@ -101,6 +101,7 @@ class ConnectionManager:
                 if user['vote'] is not None:
                     user['vote'] = '✓' # obfuscate
         
+        data['server_time'] = time.time()
         message = json.dumps({"type": "state_update", "data": data})
         for connection in self.active_connections[room_id]:
             try:

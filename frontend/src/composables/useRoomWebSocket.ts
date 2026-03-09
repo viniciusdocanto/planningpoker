@@ -16,11 +16,13 @@ export function useRoomWebSocket(roomId: string, userName: string) {
     const gameState = ref<GameState>({
         users: {}, revealed: false, host: null,
         deck_type: (sessionStorage.getItem('poker-deck') as DeckType) || 'fibonacci',
-        round_number: 0, history: [], timer_end: null, timer_duration: 60
+        round_number: 0, history: [], timer_end: null, timer_duration: 60,
+        server_time: Date.now() / 1000
     })
 
     const myVote = ref<CardValue | null>(null)
     const wsStatus = ref<WsStatus>('connecting')
+    const serverSkew = ref<number>(0) // serverTime - localTime
 
     let ws: WebSocket | null = null
     let reconnectTimer: ReturnType<typeof setTimeout> | null = null
@@ -61,6 +63,10 @@ export function useRoomWebSocket(roomId: string, userName: string) {
                         ...rawData,
                         users: rawData.users || {},
                         history: rawData.history || []
+                    }
+
+                    if (rawData.server_time) {
+                        serverSkew.value = rawData.server_time - (Date.now() / 1000)
                     }
 
                     gameState.value = updatedState
@@ -133,13 +139,11 @@ export function useRoomWebSocket(roomId: string, userName: string) {
     const leaveRoom = (): void => { disconnect(); router.push('/') }
 
     const startTimer = (secs: number): void => {
-        console.log(`⏱️ Action: start_timer (${secs}s)`)
         if (ws?.readyState === WebSocket.OPEN)
             ws.send(JSON.stringify({ action: 'start_timer', value: String(secs) }))
     }
 
     const cancelTimer = (): void => {
-        console.log('⏱️ Action: cancel_timer')
         if (ws?.readyState === WebSocket.OPEN)
             ws.send(JSON.stringify({ action: 'cancel_timer' }))
     }
@@ -148,6 +152,7 @@ export function useRoomWebSocket(roomId: string, userName: string) {
         gameState,
         myVote,
         wsStatus,
+        serverSkew,
         deck,
         isHost,
         connect,

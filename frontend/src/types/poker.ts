@@ -23,6 +23,7 @@ export interface GameState {
     history: RoundRecord[]
     timer_end: number | null
     timer_duration: number
+    server_time: number
 }
 
 /** Outgoing WebSocket message shape */
