@@ -65,6 +65,11 @@ export function useRoomWebSocket(roomId: string, userName: string) {
 
                     gameState.value = updatedState
 
+                    // Debug: check timer update
+                    if (updatedState.timer_end) {
+                        console.log(`⏱️ Timer sync: ends at ${updatedState.timer_end} (now: ${Date.now() / 1000})`)
+                    }
+
                     if (gameState.value.revealed && !wasRevealed) {
                         playRevealSound()
                     }
@@ -128,11 +133,13 @@ export function useRoomWebSocket(roomId: string, userName: string) {
     const leaveRoom = (): void => { disconnect(); router.push('/') }
 
     const startTimer = (secs: number): void => {
+        console.log(`⏱️ Action: start_timer (${secs}s)`)
         if (ws?.readyState === WebSocket.OPEN)
             ws.send(JSON.stringify({ action: 'start_timer', value: String(secs) }))
     }
 
     const cancelTimer = (): void => {
+        console.log('⏱️ Action: cancel_timer')
         if (ws?.readyState === WebSocket.OPEN)
             ws.send(JSON.stringify({ action: 'cancel_timer' }))
     }

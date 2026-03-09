@@ -135,8 +135,8 @@ class ConnectionManager:
         if room_id in self.timers:
             self.timers[room_id].cancel()
             del self.timers[room_id]
-            state.timer_end = None
-
+        
+        state.timer_end = None
         await room_store.set(room_id, state)
         await self.broadcast_state(room_id)
 
@@ -194,10 +194,16 @@ class ConnectionManager:
 
         # Schedule auto-reveal
         async def _timer_task():
-            await asyncio.sleep(duration)
-            await self.reveal_votes(room_id)
-            if room_id in self.timers:
-                del self.timers[room_id]
+            try:
+                await asyncio.sleep(duration)
+                await self.reveal_votes(room_id)
+            except asyncio.CancelledError:
+                pass
+            finally:
+                if room_id in self.timers:
+                    # Check if it's the same task
+                    if self.timers[room_id] == asyncio.current_task():
+                        del self.timers[room_id]
 
         self.timers[room_id] = asyncio.create_task(_timer_task())
         await self.broadcast_state(room_id)

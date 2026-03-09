@@ -51,7 +51,7 @@
 
 <script setup lang="ts">
 // Planning Poker - RoomView - MIT License - (c) 2026 Vinicius do Canto
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ToastContainer from '../components/ToastContainer.vue'
 import RoomHeader from '../components/RoomHeader.vue'
@@ -103,7 +103,8 @@ const timerProgress = computed<number>(() => {
 const updateTimer = () => {
   const end = gameState.value?.timer_end
   if (end) {
-    const diff = end - Date.now() / 1000
+    const now = Date.now() / 1000
+    const diff = end - now
     if (diff > 0) {
       timeLeft.value = Math.ceil(diff)
     } else {
@@ -113,6 +114,9 @@ const updateTimer = () => {
     timeLeft.value = null
   }
 }
+
+// Ensure timer updates immediately when sync arrives
+watch(() => gameState.value?.timer_end, updateTimer)
 
 onMounted(() => {
   connect()
