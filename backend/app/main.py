@@ -33,17 +33,19 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup_event():
     # Start background tasks
+    await room_store.init_redis()
     asyncio.create_task(cleanup_inactive_rooms())
+    asyncio.create_task(manager.ping_loop())
 
 async def cleanup_inactive_rooms():
     """Background task to remove rooms that have been inactive for too long."""
     while True:
         await asyncio.sleep(CLEANUP_INTERVAL)
         now = time.time()
-        rooms = room_store.list_rooms()
+        rooms = await room_store.list_rooms()
         
         for room_id in rooms:
-            state = room_store.get(room_id)
+            state = await room_store.get(room_id)
             if state and (now - state.last_activity > INACTIVE_TIMEOUT):
                 logger.info(f"Cleaning up inactive room: {room_id}")
                 # If room is active in connection manager, disconnect everyone
@@ -54,7 +56,7 @@ async def cleanup_inactive_rooms():
                             await ws.close()
                         except:
                             pass
-                room_store.delete(room_id)
+                await room_store.delete(room_id)
 
 @app.get("/")
 async def root():
@@ -101,15 +103,17 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str, username: str, 
                     await manager.start_timer(room_id, duration)
                 elif msg.action == 'cancel_timer':
                     await manager.cancel_timer(room_id)
+                elif msg.action == 'pong':
+                    await manager.handle_pong(websocket)
                     
             except Exception as e:
                 logger.error(f"Error processing message: {e}")
                 await websocket.send_text(json.dumps({"type": "error", "message": "Invalid message format"}))
 
     except WebSocketDisconnect:
-        manager.disconnect(websocket, room_id, username)
+        await manager.disconnect(websocket, room_id, username)
         await manager.broadcast_state(room_id)
     except Exception as e:
         logger.error(f"WebSocket error: {e}")
-        manager.disconnect(websocket, room_id, username)
+        await manager.disconnect(websocket, room_id, username)
         await manager.broadcast_state(room_id)

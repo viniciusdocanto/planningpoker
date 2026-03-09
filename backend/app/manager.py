@@ -20,6 +20,7 @@ class ConnectionManager:
         # active_connections[room_id] = set of WebSockets
         self.active_connections: Dict[str, Set[WebSocket]] = {}
         self.timers: Dict[str, asyncio.Task] = {}
+        self.last_pong: Dict[WebSocket, float] = {}
 
     async def connect(self, websocket: WebSocket, room_id: str, username: str, deck: str = 'fibonacci'):
         # Basic validation
@@ -32,7 +33,7 @@ class ConnectionManager:
 
         await websocket.accept()
         
-        state = room_store.get(room_id)
+        state = await room_store.get(room_id)
         if not state:
             state = RoomState(last_activity=time.time(), host=username, deck_type=deck)
         
@@ -53,27 +54,31 @@ class ConnectionManager:
             state.host = username
 
         state.last_activity = time.time()
-        room_store.set(room_id, state)
+        await room_store.set(room_id, state)
 
         if room_id not in self.active_connections:
             self.active_connections[room_id] = set()
         self.active_connections[room_id].add(websocket)
+        self.last_pong[websocket] = time.time()
         
         return True
 
-    def disconnect(self, websocket: WebSocket, room_id: str, username: str):
+    async def disconnect(self, websocket: WebSocket, room_id: str, username: str):
+        if websocket in self.last_pong:
+            del self.last_pong[websocket]
+            
         if room_id in self.active_connections:
-            self.active_connections[room_id].remove(websocket)
+            self.active_connections[room_id].discard(websocket)
             if not self.active_connections[room_id]:
                 del self.active_connections[room_id]
         
-        state = room_store.get(room_id)
+        state = await room_store.get(room_id)
         if state:
             if username in state.users:
                 del state.users[username]
             
             if not state.users:
-                room_store.delete(room_id)
+                await room_store.delete(room_id)
                 if room_id in self.timers:
                     self.timers[room_id].cancel()
                     del self.timers[room_id]
@@ -82,10 +87,10 @@ class ConnectionManager:
                 if state.host == username:
                     state.host = next(iter(state.users.keys()))
                 state.last_activity = time.time()
-                room_store.set(room_id, state)
+                await room_store.set(room_id, state)
 
     async def broadcast_state(self, room_id: str):
-        state = room_store.get(room_id)
+        state = await room_store.get(room_id)
         if not state or room_id not in self.active_connections:
             return
 
@@ -104,7 +109,7 @@ class ConnectionManager:
                 pass
 
     async def process_vote(self, room_id: str, username: str, vote: Optional[str]):
-        state = room_store.get(room_id)
+        state = await room_store.get(room_id)
         if not state or state.revealed:
             return
 
@@ -115,11 +120,11 @@ class ConnectionManager:
             state.users[username].vote = vote
             state.users[username].voted = (vote is not None)
             state.last_activity = time.time()
-            room_store.set(room_id, state)
+            await room_store.set(room_id, state)
             await self.broadcast_state(room_id)
 
     async def reveal_votes(self, room_id: str):
-        state = room_store.get(room_id)
+        state = await room_store.get(room_id)
         if not state or state.revealed:
             return
         
@@ -132,11 +137,11 @@ class ConnectionManager:
             del self.timers[room_id]
             state.timer_end = None
 
-        room_store.set(room_id, state)
+        await room_store.set(room_id, state)
         await self.broadcast_state(room_id)
 
     async def reset_votes(self, room_id: str):
-        state = room_store.get(room_id)
+        state = await room_store.get(room_id)
         if not state:
             return
 
@@ -158,30 +163,30 @@ class ConnectionManager:
         
         state.timer_end = None
         state.last_activity = time.time()
-        room_store.set(room_id, state)
+        await room_store.set(room_id, state)
         await self.broadcast_state(room_id)
 
     async def set_deck(self, room_id: str, deck_type: str):
         if deck_type not in DECK_TYPES:
             return
-        state = room_store.get(room_id)
+        state = await room_store.get(room_id)
         if state:
             state.deck_type = deck_type
             state.last_activity = time.time()
-            room_store.set(room_id, state)
+            await room_store.set(room_id, state)
             await self.broadcast_state(room_id)
 
     async def start_timer(self, room_id: str, duration: int):
         # Clamp duration 5s - 10min
         duration = max(5, min(duration, 600))
         
-        state = room_store.get(room_id)
+        state = await room_store.get(room_id)
         if not state: return
 
         state.timer_duration = duration
         state.timer_end = time.time() + duration
         state.last_activity = time.time()
-        room_store.set(room_id, state)
+        await room_store.set(room_id, state)
 
         # Cancel existing timer task
         if room_id in self.timers:
@@ -198,17 +203,40 @@ class ConnectionManager:
         await self.broadcast_state(room_id)
 
     async def cancel_timer(self, room_id: str):
-        state = room_store.get(room_id)
+        state = await room_store.get(room_id)
         if not state: return
         
         state.timer_end = None
-        room_store.set(room_id, state)
+        await room_store.set(room_id, state)
         
         if room_id in self.timers:
             self.timers[room_id].cancel()
             del self.timers[room_id]
         
-        await self.broadcast_state(room_id)
+    async def handle_pong(self, websocket: WebSocket):
+        self.last_pong[websocket] = time.time()
+
+    async def ping_loop(self):
+        """Background task to ping clients and close inactive ones."""
+        while True:
+            await asyncio.sleep(30)
+            now = time.time()
+            for room_id, websockets in list(self.active_connections.items()):
+                for ws in list(websockets):
+                    if now - self.last_pong.get(ws, now) > 60:
+                        # Client missed two pings, assume dead
+                        try:
+                            await ws.close()
+                        except:
+                            pass
+                    else:
+                        try:
+                            await ws.send_text(json.dumps({"type": "ping"}))
+                        except:
+                            try:
+                                await ws.close()
+                            except:
+                                pass
 
 # Global instance
 manager = ConnectionManager()

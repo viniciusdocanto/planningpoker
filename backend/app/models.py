@@ -32,6 +32,6 @@ class WsMessage(BaseModel):
     @field_validator('action')
     @classmethod
     def action_must_be_known(cls, v: str) -> str:
-        if v not in ('vote', 'reveal', 'reset', 'set_deck', 'start_timer', 'cancel_timer'):
+        if v not in ('vote', 'reveal', 'reset', 'set_deck', 'start_timer', 'cancel_timer', 'pong'):
             raise ValueError(f'Unknown action: {v}')
         return v
