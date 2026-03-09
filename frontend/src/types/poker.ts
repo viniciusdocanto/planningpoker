@@ -45,8 +45,13 @@ export interface WsInMessage {
     data: GameState
 }
 
+/** Incoming Ping message from server */
+export interface WsPingMessage {
+    type: 'ping'
+}
+
 /** All possible incoming WebSocket messages */
-export type WsServerMessage = WsInMessage | WsEventMessage
+export type WsServerMessage = WsInMessage | WsEventMessage | WsPingMessage
 
 /** WebSocket connection status */
 export type WsStatus = 'connecting' | 'connected' | 'reconnecting'
