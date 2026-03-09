@@ -150,3 +150,6 @@ $RECYCLE.BIN/
 *.temp
 .history/
 .direnv/
+skills-lock.json
+.agent/
+.agents/

@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.20.0] - 2026-03-09
+### Added
+- **Escalabilidade do Backend:** Implementado sistema de Heartbeat (Ping/Pong) a cada 30 segundos no WebSocket para fechar conexões inativas.
+- **Persistência Assíncrona:** Backend agora utiliza `redis.asyncio` para comunicação não-bloqueante com o Redis de forma puramente nativa no Event Loop do FastAPI.
+- **Ecossistema de Testes (Unitários):** Implementação e configuração inicial do `Vitest` para o Frontend e do `Pytest` (+ `pytest-asyncio`) para o Backend.
+### Changed
+- **Arquitetura Frontend (SRP):** Toda a lógica pesada de integração via WebSocket do `RoomView.vue` foi limpa e extraída para um composable extensível: `useRoomWebSocket.ts`.
+
 ## [0.19.0] - 2026-03-02
 ### Added
 - **Componentização Cuidadosa do `RoomView`:** Extração completa de subcomponentes (`RoomHeader`, `PokerTable`, `ResultsPanel`, `VotingDeck`) a partir da versão restaurada, garantindo paridade visual absoluta.
