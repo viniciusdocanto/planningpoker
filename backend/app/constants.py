@@ -2,7 +2,7 @@ import re
 from typing import Dict, List
 
 # --- App Version ---
-APP_VERSION = "0.19.0"  # Incrementing version for componentization milestone
+APP_VERSION = "0.20.1"
 
 # --- Cleanup & TTL ---
 CLEANUP_INTERVAL = 30 * 60      # Check every 30 minutes

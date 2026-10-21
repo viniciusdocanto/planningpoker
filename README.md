@@ -2,16 +2,16 @@
 
 > Estime tarefas com seu time em tempo real, sem recarregar a página.
 
-[![version](https://img.shields.io/badge/version-0.20.0-indigo.svg)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-0.20.1-indigo.svg)](CHANGELOG.md)
 [![license](https://img.shields.io/badge/license-MIT-purple.svg)](LICENSE)
 
 ## Tecnologias
 
 | Camada | Tecnologia |
 |---|---|
-| Backend | Python 3.12 · FastAPI · WebSockets · Pydantic v2 · Redis |
-| Frontend | Vue 3 · Vite · TypeScript · TailwindCSS v4 · Vue Router · **Vue I18n** |
-| Testes | **Playwright (E2E)** |
+| Backend | Python 3.12 · FastAPI · WebSockets · Pydantic v2 · Redis · Pytest |
+| Frontend | Vue 3 · Vite · TypeScript · TailwindCSS v4 · Vue Router · **Vue I18n** · **Vitest** |
+| Testes | **Playwright (E2E)** · **Vitest (Unit)** · **Pytest** |
 | Estilização | Glassmorphism · Inter (Google Fonts) · gradientes |
 | Deploy | Render (backend + Redis) · GitHub Pages (frontend) |
 

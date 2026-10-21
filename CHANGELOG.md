@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.20.1] - 2026-10-21
+### Added
+- **Configuração do Pytest:** Adicionado `backend/pytest.ini` com resolução automática de `pythonpath` e descoberta de testes para execução nativa com `pytest`.
+- **Script de Testes Frontend:** Adicionado script `npm test` no `package.json` para rodar a suíte unitária do Vitest em modo run.
+- **Cobertura de Testes Unitários:** Adicionada suíte de testes unitários para o composable `useToast` (`useToast.spec.ts`).
+### Fixed
+- **Sincronização de Versão:** Sincronizado `APP_VERSION` em `backend/app/constants.py` para acompanhar o versionamento global do projeto.
+
 ## [0.20.0] - 2026-03-09
 ### Added
 - **Escalabilidade do Backend:** Implementado sistema de Heartbeat (Ping/Pong) a cada 30 segundos no WebSocket para fechar conexões inativas.
