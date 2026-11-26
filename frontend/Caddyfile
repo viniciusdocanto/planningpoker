@@ -1,0 +1,19 @@
+http://{$SITE_DOMAIN:localhost} {
+	encode gzip
+
+	# WebSocket do backend
+	handle /ws/* {
+		reverse_proxy api:8000
+	}
+
+	# Frontend SPA
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
+
+	header {
+		-Server
+	}
+}

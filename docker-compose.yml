@@ -1,0 +1,33 @@
+services:
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    networks: [poker]
+
+  api:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS}
+      REDIS_URL: redis://redis:6379
+    depends_on: [redis]
+    networks: [poker]
+
+  web:
+    build:
+      context: ./frontend
+      args:
+        VITE_WS_URL: ${SITE_URL_WSS}
+    restart: unless-stopped
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN:-localhost}
+    volumes:
+      - ./frontend/Caddyfile:/etc/caddy/Caddyfile:ro
+    depends_on: [api]
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    networks: [poker]
+
+networks:
+  poker:
