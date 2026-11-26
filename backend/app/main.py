@@ -47,15 +47,11 @@ async def cleanup_inactive_rooms():
         for room_id in rooms:
             state = await room_store.get(room_id)
             if state and (now - state.last_activity > INACTIVE_TIMEOUT):
-                logger.info(f"Cleaning up inactive room: {room_id}")
-                # If room is active in connection manager, disconnect everyone
+                # H4 fix: never delete a room that still has live connections
                 if room_id in manager.active_connections:
-                    # Closing sockets will trigger disconnect logic
-                    for ws in list(manager.active_connections[room_id]):
-                        try:
-                            await ws.close()
-                        except:
-                            pass
+                    logger.info(f"Skipping cleanup of connected room: {room_id}")
+                    continue
+                logger.info(f"Cleaning up inactive room: {room_id}")
                 await room_store.delete(room_id)
 
 @app.get("/")

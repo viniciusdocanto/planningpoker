@@ -21,6 +21,15 @@ class ConnectionManager:
         self.active_connections: Dict[str, Set[WebSocket]] = {}
         self.timers: Dict[str, asyncio.Task] = {}
         self.last_pong: Dict[WebSocket, float] = {}
+        self.socket_user: Dict[WebSocket, str] = {}
+        self._room_locks: Dict[str, asyncio.Lock] = {}
+
+    def lock_for(self, room_id: str) -> asyncio.Lock:
+        """Per-room lock: all read-modify-write mutations must hold it to
+        avoid lost updates (vote racing with reveal/timer)."""
+        if room_id not in self._room_locks:
+            self._room_locks[room_id] = asyncio.Lock()
+        return self._room_locks[room_id]
 
     async def connect(self, websocket: WebSocket, room_id: str, username: str, deck: str = 'fibonacci'):
         # Basic validation
@@ -33,29 +42,31 @@ class ConnectionManager:
 
         await websocket.accept()
         
-        state = await room_store.get(room_id)
-        if not state:
-            state = RoomState(last_activity=time.time(), host=username, deck_type=deck)
-        
-        # Check if user already exists (reconnection or duplicate name)
-        if username in state.users:
-            # We allow it, but in a real app we might want more check
-            pass
-        elif len(state.users) >= MAX_USERS_PER_ROOM:
-            await websocket.send_text(json.dumps({"type": "error", "message": "Room is full"}))
-            await websocket.close()
-            return False
+        async with self.lock_for(room_id):
+            state = await room_store.get(room_id)
+            if not state:
+                state = RoomState(last_activity=time.time(), host=username, deck_type=deck)
+            
+            # Check if user already exists (reconnection or duplicate name)
+            if username in state.users:
+                # We allow it, but in a real app we might want more check
+                pass
+            elif len(state.users) >= MAX_USERS_PER_ROOM:
+                await websocket.send_text(json.dumps({"type": "error", "message": "Room is full"}))
+                await websocket.close()
+                return False
 
-        if username not in state.users:
-            state.users[username] = UserState()
-        
-        # If room has no host, this user becomes the host
-        if not state.host or state.host not in state.users:
-            state.host = username
+            if username not in state.users:
+                state.users[username] = UserState()
+            
+            # If room has no host, this user becomes the host
+            if not state.host or state.host not in state.users:
+                state.host = username
 
-        state.last_activity = time.time()
-        await room_store.set(room_id, state)
+            state.last_activity = time.time()
+            await room_store.set(room_id, state)
 
+        self.socket_user[websocket] = username
         if room_id not in self.active_connections:
             self.active_connections[room_id] = set()
         self.active_connections[room_id].add(websocket)
@@ -66,28 +77,38 @@ class ConnectionManager:
     async def disconnect(self, websocket: WebSocket, room_id: str, username: str):
         if websocket in self.last_pong:
             del self.last_pong[websocket]
+        if websocket in self.socket_user:
+            del self.socket_user[websocket]
             
         if room_id in self.active_connections:
             self.active_connections[room_id].discard(websocket)
             if not self.active_connections[room_id]:
                 del self.active_connections[room_id]
         
-        state = await room_store.get(room_id)
-        if state:
-            if username in state.users:
-                del state.users[username]
-            
-            if not state.users:
-                await room_store.delete(room_id)
-                if room_id in self.timers:
-                    self.timers[room_id].cancel()
-                    del self.timers[room_id]
-            else:
-                # If host left, assign new host
-                if state.host == username:
-                    state.host = next(iter(state.users.keys()))
-                state.last_activity = time.time()
-                await room_store.set(room_id, state)
+        async with self.lock_for(room_id):
+            state = await room_store.get(room_id)
+            if state:
+                # H3 fix: only remove the user if no other live socket
+                # of the same username remains in the room (reconnect/2 tabs).
+                other_sockets = [
+                    s for s in self.active_connections.get(room_id, set())
+                    if s is not websocket and self.socket_user.get(s) == username
+                ]
+                if username in state.users and not other_sockets:
+                    del state.users[username]
+                
+                if not state.users:
+                    await room_store.delete(room_id)
+                    if room_id in self.timers:
+                        self.timers[room_id].cancel()
+                        del self.timers[room_id]
+                    self._room_locks.pop(room_id, None)
+                else:
+                    # If host left, assign new host
+                    if state.host == username and state.host not in state.users:
+                        state.host = next(iter(state.users.keys()))
+                    state.last_activity = time.time()
+                    await room_store.set(room_id, state)
 
     async def broadcast_state(self, room_id: str):
         state = await room_store.get(room_id)
@@ -110,84 +131,96 @@ class ConnectionManager:
                 pass
 
     async def process_vote(self, room_id: str, username: str, vote: Optional[str]):
-        state = await room_store.get(room_id)
-        if not state or state.revealed:
-            return
+        async with self.lock_for(room_id):
+            state = await room_store.get(room_id)
+            if not state or state.revealed:
+                return
 
-        if vote is not None and vote not in ALLOWED_VOTES:
-            return
+            if vote is not None and vote not in ALLOWED_VOTES:
+                return
 
-        if username in state.users:
-            state.users[username].vote = vote
-            state.users[username].voted = (vote is not None)
+            if username in state.users:
+                state.users[username].vote = vote
+                state.users[username].voted = (vote is not None)
+                state.last_activity = time.time()
+                await room_store.set(room_id, state)
+                await self.broadcast_state(room_id)
+
+    async def reveal_votes(self, room_id: str):
+        async with self.lock_for(room_id):
+            state = await room_store.get(room_id)
+            if not state or state.revealed:
+                return
+            
+            state.revealed = True
             state.last_activity = time.time()
+            
+            # Cancel timer if active
+            if room_id in self.timers:
+                self.timers[room_id].cancel()
+                del self.timers[room_id]
+            
+            state.timer_end = None
             await room_store.set(room_id, state)
             await self.broadcast_state(room_id)
 
-    async def reveal_votes(self, room_id: str):
-        state = await room_store.get(room_id)
-        if not state or state.revealed:
-            return
-        
-        state.revealed = True
-        state.last_activity = time.time()
-        
-        # Cancel timer if active
-        if room_id in self.timers:
-            self.timers[room_id].cancel()
-            del self.timers[room_id]
-        
-        state.timer_end = None
-        await room_store.set(room_id, state)
-        await self.broadcast_state(room_id)
-
     async def reset_votes(self, room_id: str):
-        state = await room_store.get(room_id)
-        if not state:
-            return
+        async with self.lock_for(room_id):
+            state = await room_store.get(room_id)
+            if not state:
+                return
 
-        # Record history before resetting if it was revealed
-        if state.revealed:
-            votes = {u: s.vote for u, s in state.users.items() if s.vote}
-            if votes:
-                avg = get_average(votes)
-                record = RoundRecord(round=state.round_number, votes=votes, average=avg)
-                state.history.insert(0, record)
-                if len(state.history) > 50: # Limit history
-                    state.history = state.history[:50]
+            # Record history before resetting if it was revealed
+            if state.revealed:
+                votes = {u: s.vote for u, s in state.users.items() if s.vote}
+                if votes:
+                    avg = get_average(votes)
+                    record = RoundRecord(round=state.round_number, votes=votes, average=avg)
+                    state.history.insert(0, record)
+                    if len(state.history) > 50: # Limit history
+                        state.history = state.history[:50]
 
-        state.revealed = False
-        state.round_number += 1
-        for user in state.users.values():
-            user.vote = None
-            user.voted = False
-        
-        state.timer_end = None
-        state.last_activity = time.time()
-        await room_store.set(room_id, state)
-        await self.broadcast_state(room_id)
+            state.revealed = False
+            state.round_number += 1
+            for user in state.users.values():
+                user.vote = None
+                user.voted = False
+            
+            state.timer_end = None
+            state.last_activity = time.time()
+            await room_store.set(room_id, state)
+
+            # QA-confirmed fix: cancel the scheduled auto-reveal, otherwise
+            # the orphan timer reveals the fresh round on its own.
+            if room_id in self.timers:
+                self.timers[room_id].cancel()
+                del self.timers[room_id]
+
+            await self.broadcast_state(room_id)
 
     async def set_deck(self, room_id: str, deck_type: str):
         if deck_type not in DECK_TYPES:
             return
-        state = await room_store.get(room_id)
-        if state:
-            state.deck_type = deck_type
-            state.last_activity = time.time()
-            await room_store.set(room_id, state)
-            await self.broadcast_state(room_id)
+        async with self.lock_for(room_id):
+            state = await room_store.get(room_id)
+            if state:
+                state.deck_type = deck_type
+                state.last_activity = time.time()
+                await room_store.set(room_id, state)
+                await self.broadcast_state(room_id)
 
     async def start_timer(self, room_id: str, duration: int):
         # Clamp duration 5s - 10min
         duration = max(5, min(duration, 600))
         
-        state = await room_store.get(room_id)
-        if not state: return
+        async with self.lock_for(room_id):
+            state = await room_store.get(room_id)
+            if not state: return
 
-        state.timer_duration = duration
-        state.timer_end = time.time() + duration
-        state.last_activity = time.time()
-        await room_store.set(room_id, state)
+            state.timer_duration = duration
+            state.timer_end = time.time() + duration
+            state.last_activity = time.time()
+            await room_store.set(room_id, state)
 
         # Cancel existing timer task
         if room_id in self.timers:
@@ -210,15 +243,19 @@ class ConnectionManager:
         await self.broadcast_state(room_id)
 
     async def cancel_timer(self, room_id: str):
-        state = await room_store.get(room_id)
-        if not state: return
-        
-        state.timer_end = None
-        await room_store.set(room_id, state)
-        
-        if room_id in self.timers:
-            self.timers[room_id].cancel()
-            del self.timers[room_id]
+        async with self.lock_for(room_id):
+            state = await room_store.get(room_id)
+            if not state: return
+            
+            state.timer_end = None
+            await room_store.set(room_id, state)
+            
+            if room_id in self.timers:
+                self.timers[room_id].cancel()
+                del self.timers[room_id]
+            
+            # H2 fix: clients kept counting down locally until the next update
+            await self.broadcast_state(room_id)
         
     async def handle_pong(self, websocket: WebSocket):
         self.last_pong[websocket] = time.time()
