@@ -230,9 +230,12 @@ class ConnectionManager:
         async def _timer_task():
             try:
                 await asyncio.sleep(duration)
+                logger.warning(f"Timer expired for room {room_id}, revealing")
                 await self.reveal_votes(room_id)
             except asyncio.CancelledError:
                 pass
+            except Exception:
+                logger.exception(f"Timer auto-reveal failed for room {room_id}")
             finally:
                 if room_id in self.timers:
                     # Check if it's the same task
@@ -240,6 +243,7 @@ class ConnectionManager:
                         del self.timers[room_id]
 
         self.timers[room_id] = asyncio.create_task(_timer_task())
+        logger.warning(f"Timer created for room {room_id}, duration={duration}")
         await self.broadcast_state(room_id)
 
     async def cancel_timer(self, room_id: str):
