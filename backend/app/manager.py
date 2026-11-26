@@ -155,9 +155,13 @@ class ConnectionManager:
             state.revealed = True
             state.last_activity = time.time()
             
-            # Cancel timer if active
+            # Cancel timer if active. NEVER cancel the current task:
+            # when called from _timer_task, timers[room_id] IS this task,
+            # and cancelling it aborts the reveal mid-flight (set/broadcast
+            # never run) - the auto-reveal silently did nothing.
             if room_id in self.timers:
-                self.timers[room_id].cancel()
+                if self.timers[room_id] is not asyncio.current_task():
+                    self.timers[room_id].cancel()
                 del self.timers[room_id]
             
             state.timer_end = None
@@ -230,7 +234,6 @@ class ConnectionManager:
         async def _timer_task():
             try:
                 await asyncio.sleep(duration)
-                logger.warning(f"Timer expired for room {room_id}, revealing")
                 await self.reveal_votes(room_id)
             except asyncio.CancelledError:
                 pass
@@ -243,7 +246,6 @@ class ConnectionManager:
                         del self.timers[room_id]
 
         self.timers[room_id] = asyncio.create_task(_timer_task())
-        logger.warning(f"Timer created for room {room_id}, duration={duration}")
         await self.broadcast_state(room_id)
 
     async def cancel_timer(self, room_id: str):
